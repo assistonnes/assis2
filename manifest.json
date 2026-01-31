@@ -1,7 +1,7 @@
 {
   "name": "Assistonnes Piano",
   "short_name": "Piano",
-  "start_url": "/",
+  "start_url": "/index.html",
   "scope": "/",
   "display": "standalone",
   "background_color": "#000000",
