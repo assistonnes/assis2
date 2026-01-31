@@ -1,4 +1,4 @@
-// staff.js — FULLY self-contained (CSS + HTML + SVG + logic)
+// staff.js — FULLY self-contained (CSS + HTML + SVG + logic) with per-key mapping
 (function () {
   /* =======================
      CSS
@@ -106,15 +106,23 @@
   ======================= */
   let keySignature = "C";
 
-  const KEY_SIGS = {
-    C:[], G:["F#"], D:["F#","C#"], A:["F#","C#","G#"],
-    E:["F#","C#","G#","D#"], B:["F#","C#","G#","D#","A#"],
-    "F#":["F#","C#","G#","D#","A#","E#"],
-    "C#":["F#","C#","G#","D#","A#","E#","B#"],
-    F:["Bb"], Bb:["Bb","Eb"], Eb:["Bb","Eb","Ab"],
-    Ab:["Bb","Eb","Ab","Db"], Db:["Bb","Eb","Ab","Db","Gb"],
-    Gb:["Bb","Eb","Ab","Db","Gb","Cb"],
-    Cb:["Bb","Eb","Ab","Db","Gb","Cb","Fb"]
+  // Per-key mapping: piano key -> staff letter (with accidental if needed)
+  const STAFF_MAPPING = {
+    C:   {C:'C', D:'D', E:'E', F:'F', G:'G', A:'A', B:'B'},
+    G:   {C:'C', D:'D', E:'E', F:'F#', G:'G', A:'A', B:'B'},
+    D:   {C:'C#', D:'D', E:'E', F:'F#', G:'G', A:'A', B:'B'},
+    A:   {C:'C#', D:'D', E:'E', F:'F#', G:'G#', A:'A', B:'B'},
+    E:   {C:'C#', D:'D#', E:'E', F:'F#', G:'G#', A:'A', B:'B'},
+    B:   {C:'C#', D:'D#', E:'E', F:'F#', G:'G#', A:'A#', B:'B'},
+    'F#':{C:'C#', D:'D#', E:'E#', F:'F#', G:'G#', A:'A#', B:'B#'},
+    'C#':{C:'C#', D:'D#', E:'E#', F:'F#', G:'G#', A:'A#', B:'B#'},
+    F:   {C:'C', D:'D', E:'E', F:'F', G:'G', A:'A', B:'Bb'},
+    Bb:  {C:'C', D:'D', E:'Eb', F:'F', G:'G', A:'A', B:'Bb'},
+    Eb:  {C:'C', D:'D', E:'Eb', F:'F', G:'G', A:'Ab', B:'Bb'},
+    Ab:  {C:'C', D:'Db', E:'Eb', F:'F', G:'G', A:'Ab', B:'Bb'},
+    Db:  {C:'C', D:'Db', E:'Eb', F:'F', G:'Gb', A:'Ab', B:'Bb'},
+    Gb:  {C:'C', D:'Db', E:'Eb', F:'F', G:'Gb', A:'Ab', B:'Cb'},
+    Cb:  {C:'Cb', D:'Db', E:'Eb', F:'Fb', G:'Gb', A:'Ab', B:'Cb'}
   };
 
   const letterIndex = {C:0,D:1,E:2,F:3,G:4,A:5,B:6};
@@ -130,23 +138,6 @@
   }
 
   const REF = diatonicStep({letter:"E", octave:4});
-
-  // APPLY KEY SIGNATURE
-  function applyKeySignature(n, keySig) {
-    const alt = {};
-    (KEY_SIGS[keySig] || []).forEach(s => alt[s[0]] = s[1]);
-    const acc = alt[n.letter] || "";
-    let showAcc = "";
-
-    // Determine accidental to display
-    if (n.accidental) {
-      if (n.accidental !== acc) showAcc = n.accidental === "#" ? "♯" : "♭";
-    } else if (acc) {
-      showAcc = ""; // key signature covers it, no symbol
-    }
-
-    return { letter: n.letter, accidental: n.accidental || "", octave: n.octave, displayAcc: showAcc };
-  }
 
   /* =======================
      STATIC DRAW
@@ -200,13 +191,19 @@
 
   function renderNote(name) {
     notesGroup.innerHTML = "";
-    let n = parseNote(name);
+    const n = parseNote(name);
     if (!n) return;
 
-    n = applyKeySignature(n, keySignature); // ⚡ KEY-SIGNATURE AWARE
+    // --- Map piano letter to staff letter per key ---
+    const staffLetterRaw = STAFF_MAPPING[keySignature][n.letter] || n.letter;
+    const staffLetter = staffLetterRaw.replace(/[b#]/,'');
+    const accidentalStaff = staffLetterRaw.includes('#') ? '#' :
+                            staffLetterRaw.includes('b') ? 'b' : '';
 
-    const step = diatonicStep(n) - REF;
-    const y = trebleBottom - step * (lineSpacing/2);
+    // create new note object for diatonic calculation
+    const nStaff = {letter:staffLetter, octave:n.octave};
+    const step = diatonicStep(nStaff) - REF;
+    const y = trebleBottom - step * half;
 
     if (y < trebleTop)
       for (let yy=trebleTop-lineSpacing; yy>=y; yy-=lineSpacing) ledger(yy);
@@ -232,13 +229,19 @@
     stem.setAttribute("stroke","#000");
     notesGroup.appendChild(stem);
 
-    // display accidental if needed
-    if (n.displayAcc) {
+    // --- Determine if accidental is displayed ---
+    let acc = "";
+    if (n.accidental) {
+      if (n.accidental !== accidentalStaff)
+        acc = n.accidental === "#" ? "♯" : "♭";
+    } else if (accidentalStaff) acc = "♮";
+
+    if (acc) {
       const t = document.createElementNS(SVG_NS,"text");
       t.setAttribute("x",noteX-18);
       t.setAttribute("y",y+4);
       t.setAttribute("font-size",12);
-      t.textContent = n.displayAcc;
+      t.textContent = acc;
       notesGroup.appendChild(t);
     }
   }
