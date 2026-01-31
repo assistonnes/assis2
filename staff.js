@@ -131,26 +131,21 @@
 
   const REF = diatonicStep({letter:"E", octave:4});
 
-  // KEY SIGNATURE ADJUSTMENT
+  // APPLY KEY SIGNATURE
   function applyKeySignature(n, keySig) {
     const alt = {};
-    (KEY_SIGS[keySig] || []).forEach(s => {
-      const l = s[0];
-      const acc = s[1] || "#"; 
-      alt[l] = acc;
-    });
-    // if the note matches a key sig, respell it
-    let letter = n.letter;
-    let accidental = n.accidental || "";
-    if (alt[letter]) {
-      if (accidental === "") {
-        accidental = alt[letter]; // apply sharp/flat from key
-      } else if (accidental !== alt[letter]) {
-        // natural needed
-        accidental = accidental; // keep user accidental
-      }
+    (KEY_SIGS[keySig] || []).forEach(s => alt[s[0]] = s[1]);
+    const acc = alt[n.letter] || "";
+    let showAcc = "";
+
+    // Determine accidental to display
+    if (n.accidental) {
+      if (n.accidental !== acc) showAcc = n.accidental === "#" ? "♯" : "♭";
+    } else if (acc) {
+      showAcc = ""; // key signature covers it, no symbol
     }
-    return { letter, accidental, octave: n.octave };
+
+    return { letter: n.letter, accidental: n.accidental || "", octave: n.octave, displayAcc: showAcc };
   }
 
   /* =======================
@@ -211,8 +206,7 @@
     n = applyKeySignature(n, keySignature); // ⚡ KEY-SIGNATURE AWARE
 
     const step = diatonicStep(n) - REF;
-    const halfStep = lineSpacing / 2;
-    const y = trebleBottom - step * halfStep;
+    const y = trebleBottom - step * (lineSpacing/2);
 
     if (y < trebleTop)
       for (let yy=trebleTop-lineSpacing; yy>=y; yy-=lineSpacing) ledger(yy);
@@ -238,21 +232,13 @@
     stem.setAttribute("stroke","#000");
     notesGroup.appendChild(stem);
 
-    // ACCIDENTAL DISPLAY
-    const alt = {};
-    (KEY_SIGS[keySignature] || []).forEach(s => alt[s[0]] = s[1]);
-    let acc = "";
-    if (n.accidental) {
-      if (alt[n.letter] !== n.accidental)
-        acc = n.accidental === "#" ? "♯" : "♭";
-    } else if (alt[n.letter]) acc = "♮";
-
-    if (acc) {
+    // display accidental if needed
+    if (n.displayAcc) {
       const t = document.createElementNS(SVG_NS,"text");
       t.setAttribute("x",noteX-18);
       t.setAttribute("y",y+4);
       t.setAttribute("font-size",12);
-      t.textContent = acc;
+      t.textContent = n.displayAcc;
       notesGroup.appendChild(t);
     }
   }
