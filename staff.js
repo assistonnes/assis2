@@ -1,99 +1,255 @@
-/* staff.js - Draws piano notes on staff correctly for all key signatures */
-
-(function(){
-  // --- Minimal CSS for staff lines & note positions ---
+// staff.js — FULLY self-contained (CSS + HTML + SVG + logic)
+(function () {
+  /* =======================
+     CSS
+  ======================= */
   const css = `
-#staff { width: 100%; height: 120px; margin: 10px auto; position: relative; }
-.staff-line { position: absolute; left: 0; right: 0; height: 1px; background: black; }
-.note { position: absolute; width: 12px; height: 12px; background: red; border-radius: 50%; text-align: center; font-size: 8px; line-height: 12px; color: white; user-select: none; }
-`;
-  const style = document.createElement('style'); style.textContent = css;
+  #controls-wrapper {
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+  }
+  #key-select-wrapper {
+    position: absolute;
+    right: 50%;
+    transform: translate(-160%, -50%);
+    top: 50%;
+    min-width: 60px;
+    text-align: right;
+    z-index: 10;
+    font-family: system-ui, sans-serif;
+    font-size: 14px;
+  }
+  #image-placeholder {
+    transform: translate(-8%, 0%);
+    width: 150px;
+    height: 130px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin: 0 auto;
+    position: relative;
+  }
+  #image-placeholder svg {
+    width: 100%;
+    height: 100%;
+  }
+  `;
+  const style = document.createElement("style");
+  style.textContent = css;
   document.head.appendChild(style);
 
-  // --- Staff setup ---
-  const staff = document.createElement('div'); staff.id='staff';
-  document.body.appendChild(staff);
-  const lineSpacing = 14;
-  const lines = [];
-  for(let i=0;i<5;i++){
-    const line = document.createElement('div'); line.className='staff-line';
-    line.style.top = (i*lineSpacing)+'px'; staff.appendChild(line);
-    lines.push(line);
-  }
+  /* =======================
+     HTML
+  ======================= */
+  const wrapper = document.createElement("div");
+  wrapper.id = "controls-wrapper";
+  wrapper.innerHTML = `
+    <div id="key-select-wrapper">
+      Key:
+      <select id="key-selector">
+        <option>C</option><option>G</option><option>D</option><option>A</option>
+        <option>E</option><option>B</option><option>F#</option><option>C#</option>
+        <option>F</option><option>Bb</option><option>Eb</option><option>Ab</option>
+        <option>Db</option><option>Gb</option><option>Cb</option>
+      </select>
+    </div>
+    <div id="image-placeholder"></div>
+  `;
+  document.body.prepend(wrapper);
 
-  // --- Note pitch mapping ---
-  const NOTE_TO_SEMITONE = { C:0, D:2, E:4, F:5, G:7, A:9, B:11 };
+  const container = document.getElementById("image-placeholder");
+  if (!container) return;
 
-  function noteStringToSemitone(note){
-    const m = note.match(/^([A-G])([#b]?)(-?\d+)$/);
-    if(!m) return null;
-    const [,L,A,O] = m;
-    return (+O)*12 + NOTE_TO_SEMITONE[L] + (A==='#'?1:(A==='b'?-1:0));
-  }
+  /* =======================
+     SVG SETUP
+  ======================= */
+  const SVG_NS = "http://www.w3.org/2000/svg";
+  const W = 230, H = 230;
 
-  // --- Key signature scales ---
-  const KEY_SCALES = {
-    'C':  ['C','D','E','F','G','A','B'],
-    'G':  ['G','A','B','C','D','E','F#'],
-    'D':  ['D','E','F#','G','A','B','C#'],
-    'A':  ['A','B','C#','D','E','F#','G#'],
-    'E':  ['E','F#','G#','A','B','C#','D#'],
-    'B':  ['B','C#','D#','E','F#','G#','A#'],
-    'F#': ['F#','G#','A#','B','C#','D#','E#'],
-    'C#': ['C#','D#','E#','F#','G#','A#','B#'],
-    'F':  ['F','G','A','Bb','C','D','E'],
-    'Bb': ['Bb','C','D','Eb','F','G','A'],
-    'Eb': ['Eb','F','G','Ab','Bb','C','D'],
-    'Ab': ['Ab','Bb','C','Db','Eb','F','G'],
-    'Db': ['Db','Eb','F','Gb','Ab','Bb','C'],
-    'Gb': ['Gb','Ab','Bb','Cb','Db','Eb','F'],
-    'Cb': ['Cb','Db','Eb','Fb','Gb','Ab','Bb']
+  const svg = document.createElementNS(SVG_NS, "svg");
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  container.appendChild(svg);
+
+  const staticGroup = document.createElementNS(SVG_NS, "g");
+  const notesGroup = document.createElementNS(SVG_NS, "g");
+  svg.appendChild(staticGroup);
+  svg.appendChild(notesGroup);
+
+  /* =======================
+     LAYOUT
+  ======================= */
+  const leftMargin = 48;
+  const rightMargin = W - 20;
+  const lineSpacing = 16;
+  const half = lineSpacing / 2;
+
+  const totalHeight = 4*lineSpacing + 2*lineSpacing + 4*lineSpacing;
+  const topMargin = (H - totalHeight) / 2;
+
+  const trebleTop = topMargin;
+  const trebleBottom = trebleTop + 4 * lineSpacing;
+  const bassTop = trebleBottom + 2 * lineSpacing;
+  const bassBottom = bassTop + 4 * lineSpacing;
+
+  const noteX = W / 2 + 30;
+
+  /* =======================
+     THEORY
+  ======================= */
+  let keySignature = "C";
+
+  const KEY_SIGS = {
+    C:[], G:["F#"], D:["F#","C#"], A:["F#","C#","G#"],
+    E:["F#","C#","G#","D#"], B:["F#","C#","G#","D#","A#"],
+    "F#":["F#","C#","G#","D#","A#","E#"],
+    "C#":["F#","C#","G#","D#","A#","E#","B#"],
+    F:["Bb"], Bb:["Bb","Eb"], Eb:["Bb","Eb","Ab"],
+    Ab:["Bb","Eb","Ab","Db"], Db:["Bb","Eb","Ab","Db","Gb"],
+    Gb:["Bb","Eb","Ab","Db","Gb","Cb"],
+    Cb:["Bb","Eb","Ab","Db","Gb","Cb","Fb"]
   };
 
-  function respellForKey(note, key){
-    const semi = noteStringToSemitone(note);
-    if(semi===null) return note;
-    const scale = KEY_SCALES[key];
-    if(!scale) return note;
+  const letterIndex = {C:0,D:1,E:2,F:3,G:4,A:5,B:6};
 
-    // check scale degrees near octave
-    for(let octave=-1; octave<=8; octave++){
-      for(const s of scale){
-        const m = s.match(/^([A-G])([#b]?)/);
-        const letter = m[1], acc = m[2]||'';
-        const test = octave*12 + NOTE_TO_SEMITONE[letter] + (acc==='#'?1:(acc==='b'?-1:0));
-        if(test===semi) return `${letter}${acc}${octave}`;
-      }
+  function parseNote(n) {
+    const m = /^([A-G])([#b]?)(-?\d+)$/.exec(n);
+    if (!m) return null;
+    return { letter:m[1], accidental:m[2], octave:+m[3] };
+  }
+
+  function diatonicStep(n) {
+    return n.octave * 7 + letterIndex[n.letter];
+  }
+
+  const REF = diatonicStep({letter:"E", octave:4});
+
+  function keyAlterations(k) {
+    const a = {};
+    (KEY_SIGS[k] || []).forEach(n => a[n[0]] = n[1]);
+    return a;
+  }
+
+  /* =======================
+     STATIC DRAW
+  ======================= */
+  function drawLines(topY) {
+    for (let i=0;i<5;i++) {
+      const y = topY + i*lineSpacing;
+      const l = document.createElementNS(SVG_NS,"line");
+      l.setAttribute("x1", leftMargin-36);
+      l.setAttribute("x2", rightMargin);
+      l.setAttribute("y1", y);
+      l.setAttribute("y2", y);
+      l.setAttribute("stroke","#000");
+      staticGroup.appendChild(l);
     }
-    return note;
   }
 
-  // --- Staff note positioning ---
-  const BASE_LINE = 60; // middle line y-pos for C4
-  const STEP = 7;       // half-step vertical distance
+  function drawStatic() {
+    staticGroup.innerHTML = "";
 
-  function noteYPosition(note){
-    const semitone = noteStringToSemitone(note);
-    const C4 = noteStringToSemitone('C4');
-    return BASE_LINE - (semitone - C4)*STEP/2; // each staff line = 1 step
+    drawLines(trebleTop);
+    drawLines(bassTop);
+
+    const treble = document.createElementNS(SVG_NS,"text");
+    treble.setAttribute("x", leftMargin-34);
+    treble.setAttribute("y", trebleBottom);
+    treble.setAttribute("font-size", 60);
+    treble.textContent = "𝄞";
+    staticGroup.appendChild(treble);
+
+    const bass = document.createElementNS(SVG_NS,"text");
+    bass.setAttribute("x", leftMargin-34);
+    bass.setAttribute("y", bassBottom-8);
+    bass.setAttribute("font-size", 60);
+    bass.textContent = "𝄢";
+    staticGroup.appendChild(bass);
   }
 
-  const currentNotes = [];
-
-  function drawNote(note, keySignature='C'){
-    const respelled = respellForKey(note, keySignature);
-    const y = noteYPosition(respelled);
-
-    const el = document.createElement('div'); el.className='note';
-    el.style.top = y+'px';
-    el.textContent = respelled.replace(/\d+/,'');
-    staff.appendChild(el);
-    currentNotes.push(el);
-
-    // auto remove after 1s
-    setTimeout(()=>{ el.remove(); }, 1000);
+  /* =======================
+     NOTE DRAW
+  ======================= */
+  function ledger(y) {
+    const l = document.createElementNS(SVG_NS,"line");
+    l.setAttribute("x1", noteX-18);
+    l.setAttribute("x2", noteX+18);
+    l.setAttribute("y1", y);
+    l.setAttribute("y2", y);
+    l.setAttribute("stroke","#000");
+    notesGroup.appendChild(l);
   }
 
-  window.staffDrawNote = drawNote;
+  function renderNote(name) {
+    notesGroup.innerHTML = "";
+    const n = parseNote(name);
+    if (!n) return;
 
+    const step = diatonicStep(n) - REF;
+    const y = trebleBottom - step * half;
+
+    if (y < trebleTop)
+      for (let yy=trebleTop-lineSpacing; yy>=y; yy-=lineSpacing) ledger(yy);
+
+    if (y > bassBottom)
+      for (let yy=bassBottom+lineSpacing; yy<=y; yy+=lineSpacing) ledger(yy);
+
+    const head = document.createElementNS(SVG_NS,"ellipse");
+    head.setAttribute("cx",noteX);
+    head.setAttribute("cy",y);
+    head.setAttribute("rx",9);
+    head.setAttribute("ry",6);
+    head.setAttribute("transform",`rotate(-20 ${noteX} ${y})`);
+    head.setAttribute("fill","#000");
+    notesGroup.appendChild(head);
+
+    const stem = document.createElementNS(SVG_NS,"line");
+    const up = y > trebleTop + 2*lineSpacing;
+    stem.setAttribute("x1", up ? noteX-8 : noteX+8);
+    stem.setAttribute("y1", y);
+    stem.setAttribute("x2", up ? noteX-8 : noteX+8);
+    stem.setAttribute("y2", y + (up?36:-36));
+    stem.setAttribute("stroke","#000");
+    notesGroup.appendChild(stem);
+
+    const alt = keyAlterations(keySignature);
+    let acc = "";
+    if (n.accidental) {
+      if (alt[n.letter] !== n.accidental)
+        acc = n.accidental === "#" ? "♯" : "♭";
+    } else if (alt[n.letter]) acc = "♮";
+
+    if (acc) {
+      const t = document.createElementNS(SVG_NS,"text");
+      t.setAttribute("x",noteX-18);
+      t.setAttribute("y",y+4);
+      t.setAttribute("font-size",12);
+      t.textContent = acc;
+      notesGroup.appendChild(t);
+    }
+  }
+
+  /* =======================
+     API + EVENTS
+  ======================= */
+  window.staffDrawNote = n => { try { renderNote(n); } catch(e){console.error(e);} };
+  window.staffSetKey = k => { keySignature = k; drawStatic(); };
+
+  document.getElementById("key-selector").addEventListener("change", e => {
+    staffSetKey(e.target.value);
+  });
+
+  window.addEventListener("resize", () => {
+    drawStatic();
+    notesGroup.innerHTML = "";
+  });
+
+  drawStatic();
 })();
