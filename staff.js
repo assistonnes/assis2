@@ -131,23 +131,21 @@
 
   const REF = diatonicStep({letter:"E", octave:4});
 
-  function keyAlterations(k) {
-    const a = {};
-    (KEY_SIGS[k] || []).forEach(n => a[n[0]] = n[1]);
-    return a;
-  }
+  // APPLY KEY SIGNATURE
+  function applyKeySignature(n, keySig) {
+    const alt = {};
+    (KEY_SIGS[keySig] || []).forEach(s => alt[s[0]] = s[1]);
+    const acc = alt[n.letter] || "";
+    let showAcc = "";
 
-  function applyKeySignature(n, key) {
-    const alt = keyAlterations(key);
-    const realLetter = n.letter;
-    const accidentalInKey = alt[realLetter] || "";
-    return { ...n, effectiveAccidental: n.accidental || accidentalInKey };
-  }
+    // Determine accidental to display
+    if (n.accidental) {
+      if (n.accidental !== acc) showAcc = n.accidental === "#" ? "♯" : "♭";
+    } else if (acc) {
+      showAcc = ""; // key signature covers it, no symbol
+    }
 
-  function effectiveDiatonicStep(n) {
-    const nEff = applyKeySignature(n, keySignature);
-    // Compute diatonic step ignoring accidental (only uses letter and octave)
-    return diatonicStep({ letter: nEff.letter, octave: nEff.octave });
+    return { letter: n.letter, accidental: n.accidental || "", octave: n.octave, displayAcc: showAcc };
   }
 
   /* =======================
@@ -202,12 +200,13 @@
 
   function renderNote(name) {
     notesGroup.innerHTML = "";
-    const n = parseNote(name);
+    let n = parseNote(name);
     if (!n) return;
 
-    // Use key-aware effective letter for vertical position
-    const step = effectiveDiatonicStep(n) - REF;
-    const y = trebleBottom - step * half;
+    n = applyKeySignature(n, keySignature); // ⚡ KEY-SIGNATURE AWARE
+
+    const step = diatonicStep(n) - REF;
+    const y = trebleBottom - step * (lineSpacing/2);
 
     if (y < trebleTop)
       for (let yy=trebleTop-lineSpacing; yy>=y; yy-=lineSpacing) ledger(yy);
@@ -224,23 +223,22 @@
     head.setAttribute("fill","#000");
     notesGroup.appendChild(head);
 
-    const nEff = applyKeySignature(n, keySignature);
-    const alt = keyAlterations(keySignature);
+    const stem = document.createElementNS(SVG_NS,"line");
+    const up = y > trebleTop + 2*lineSpacing;
+    stem.setAttribute("x1", up ? noteX-8 : noteX+8);
+    stem.setAttribute("y1", y);
+    stem.setAttribute("x2", up ? noteX-8 : noteX+8);
+    stem.setAttribute("y2", y + (up?36:-36));
+    stem.setAttribute("stroke","#000");
+    notesGroup.appendChild(stem);
 
-    let acc = "";
-    if (n.accidental) {
-      if (alt[n.letter] !== n.accidental)
-        acc = n.accidental === "#" ? "♯" : "♭";
-    } else if (nEff.effectiveAccidental && nEff.effectiveAccidental !== n.accidental) {
-      acc = nEff.effectiveAccidental === "#" ? "♯" : "♭";
-    }
-
-    if (acc) {
+    // display accidental if needed
+    if (n.displayAcc) {
       const t = document.createElementNS(SVG_NS,"text");
       t.setAttribute("x",noteX-18);
       t.setAttribute("y",y+4);
       t.setAttribute("font-size",12);
-      t.textContent = acc;
+      t.textContent = n.displayAcc;
       notesGroup.appendChild(t);
     }
   }
