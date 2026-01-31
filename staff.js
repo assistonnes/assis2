@@ -1,4 +1,4 @@
-// staff.js — enharmonic-safe, geometry-correct
+// staff.js — per-key enharmonic mapping, geometry-safe
 (function () {
 
   /* =======================
@@ -92,7 +92,7 @@
   const lineSpacing = 16;
   const half = lineSpacing / 2;
 
-  const totalHeight = 4*lineSpacing + 2*lineSpacing + 4*lineSpacing;
+  const totalHeight = 10 * lineSpacing;
   const topMargin = (H - totalHeight) / 2;
 
   const trebleTop = topMargin;
@@ -103,36 +103,27 @@
   const noteX = W / 2 + 30;
 
   /* =======================
-     THEORY TABLES
+     PER-KEY TABLES (FIXED)
   ======================= */
   const KEY_SCALES = {
-    C:["C","D","E","F","G","A","B"],
-    G:["G","A","B","C","D","E","F#"],
-    D:["D","E","F#","G","A","B","C#"],
-    A:["A","B","C#","D","E","F#","G#"],
-    E:["E","F#","G#","A","B","C#","D#"],
-    B:["B","C#","D#","E","F#","G#","A#"],
-    F#:["F#","G#","A#","B","C#","D#","E#"],
-    C#:["C#","D#","E#","F#","G#","A#","B#"],
-    F:["F","G","A","Bb","C","D","E"],
-    Bb:["Bb","C","D","Eb","F","G","A"],
-    Eb:["Eb","F","G","Ab","Bb","C","D"],
-    Ab:["Ab","Bb","C","Db","Eb","F","Gb"],
-    Db:["Db","Eb","F","Gb","Ab","Bb","C"],
-    Gb:["Gb","Ab","Bb","C","Db","Eb","F"],
-    Cb:["Cb","Db","Eb","Fb","Gb","Ab","Bb"]
+    "C":  ["C","D","E","F","G","A","B"],
+    "G":  ["G","A","B","C","D","E","F#"],
+    "D":  ["D","E","F#","G","A","B","C#"],
+    "A":  ["A","B","C#","D","E","F#","G#"],
+    "E":  ["E","F#","G#","A","B","C#","D#"],
+    "B":  ["B","C#","D#","E","F#","G#","A#"],
+    "F#": ["F#","G#","A#","B","C#","D#","E#"],
+    "C#": ["C#","D#","E#","F#","G#","A#","B#"],
+    "F":  ["F","G","A","Bb","C","D","E"],
+    "Bb": ["Bb","C","D","Eb","F","G","A"],
+    "Eb": ["Eb","F","G","Ab","Bb","C","D"],
+    "Ab": ["Ab","Bb","C","Db","Eb","F","Gb"],
+    "Db": ["Db","Eb","F","Gb","Ab","Bb","C"],
+    "Gb": ["Gb","Ab","Bb","C","Db","Eb","F"],
+    "Cb": ["Cb","Db","Eb","Fb","Gb","Ab","Bb"]
   };
 
   const STAFF_INDEX = { C:0, D:1, E:2, F:3, G:4, A:5, B:6 };
-
-  const ENHARMONIC = {
-    "C#":"Db","Db":"C#","D#":"Eb","Eb":"D#",
-    "E":"Fb","Fb":"E","E#":"F","F":"E#",
-    "F#":"Gb","Gb":"F#","G#":"Ab","Ab":"G#",
-    "A#":"Bb","Bb":"A#","B":"Cb","Cb":"B",
-    "B#":"C","C":"B#"
-  };
-
   let keySignature = "C";
 
   /* =======================
@@ -143,10 +134,18 @@
     return m?{letter:m[1],acc:m[2],oct:+m[3]}:null;
   }
   function pitchClass(n){ return n.replace(/\d+/g,""); }
-  function enharmonic(a,b){ return a===b||ENHARMONIC[a]===b; }
 
-  function findDegree(pitch,key){
-    return KEY_SCALES[key].findIndex(n=>enharmonic(n,pitch));
+  function enharmonic(a,b){
+    return a===b ||
+      (a==="F"&&b==="E#")||(a==="E#"&&b==="F")||
+      (a==="B"&&b==="Cb")||(a==="Cb"&&b==="B")||
+      (a==="C"&&b==="B#")||(a==="B#"&&b==="C")||
+      (a==="E"&&b==="Fb")||(a==="Fb"&&b==="E")||
+      (a[0]===b[0]);
+  }
+
+  function findDegree(p,key){
+    return KEY_SCALES[key].findIndex(n=>enharmonic(n,p));
   }
 
   function staffStep(letter,oct){
@@ -214,7 +213,7 @@
     if(deg<0) return;
 
     const spelled=KEY_SCALES[keySignature][deg];
-    const staffLetter=spelled[0]; // SAFE: C D E F G A B only
+    const staffLetter=spelled[0];
 
     const step=staffStep(staffLetter,n.oct)-REF;
     const y=trebleBottom-step*half;
