@@ -131,9 +131,14 @@
 
   const REF = diatonicStep({letter:"E", octave:4});
 
+  // --- FIXED: Correct accidental mapping for drawing
   function keyAlterations(k) {
     const a = {};
-    (KEY_SIGS[k] || []).forEach(n => a[n[0]] = n[1]);
+    (KEY_SIGS[k] || []).forEach(n => {
+      const l = n[0]; // letter
+      let acc = n.slice(1);
+      a[l] = acc; // assign correct accidental, including '#' beyond B
+    });
     return a;
   }
 
@@ -192,15 +197,17 @@
     const n = parseNote(name);
     if (!n) return;
 
+    // --- Calculate y-position using diatonic steps
     const step = diatonicStep(n) - REF;
     const y = trebleBottom - step * half;
 
+    // --- Ledgers if outside staff
     if (y < trebleTop)
       for (let yy=trebleTop-lineSpacing; yy>=y; yy-=lineSpacing) ledger(yy);
-
     if (y > bassBottom)
       for (let yy=bassBottom+lineSpacing; yy<=y; yy+=lineSpacing) ledger(yy);
 
+    // --- Draw note head
     const head = document.createElementNS(SVG_NS,"ellipse");
     head.setAttribute("cx",noteX);
     head.setAttribute("cy",y);
@@ -210,6 +217,7 @@
     head.setAttribute("fill","#000");
     notesGroup.appendChild(head);
 
+    // --- Draw stem
     const stem = document.createElementNS(SVG_NS,"line");
     const up = y > trebleTop + 2*lineSpacing;
     stem.setAttribute("x1", up ? noteX-8 : noteX+8);
@@ -219,12 +227,15 @@
     stem.setAttribute("stroke","#000");
     notesGroup.appendChild(stem);
 
+    // --- Draw accidental if needed
     const alt = keyAlterations(keySignature);
     let acc = "";
     if (n.accidental) {
       if (alt[n.letter] !== n.accidental)
         acc = n.accidental === "#" ? "♯" : "♭";
-    } else if (alt[n.letter]) acc = "♮";
+    } else if (alt[n.letter]) {
+      acc = alt[n.letter]==="#" ? "♯" : "♭";
+    }
 
     if (acc) {
       const t = document.createElementNS(SVG_NS,"text");
