@@ -1,7 +1,8 @@
-// staff.js — FULLY self-contained (CSS + HTML + SVG + logic) with per-key mapping
+// staff.js — self-contained, enharmonic-correct, per-key mapping
 (function () {
+
   /* =======================
-     CSS
+     CSS (UNCHANGED)
   ======================= */
   const css = `
   #controls-wrapper {
@@ -102,30 +103,48 @@
   const noteX = W / 2 + 30;
 
   /* =======================
-     THEORY
+     THEORY TABLES
   ======================= */
-  let keySignature = "C";
 
-  // Per-key mapping: piano key -> staff letter (with accidental if needed)
-  const STAFF_MAPPING = {
-    C:   {C:'C', D:'D', E:'E', F:'F', G:'G', A:'A', B:'B'},
-    G:   {C:'C', D:'D', E:'E', F:'F#', G:'G', A:'A', B:'B'},
-    D:   {C:'C#', D:'D', E:'E', F:'F#', G:'G', A:'A', B:'B'},
-    A:   {C:'C#', D:'D', E:'E', F:'F#', G:'G#', A:'A', B:'B'},
-    E:   {C:'C#', D:'D#', E:'E', F:'F#', G:'G#', A:'A', B:'B'},
-    B:   {C:'C#', D:'D#', E:'F', F:'F#', G:'G#', A:'A#', B:'B'},
-    'F#':{C:'C#', D:'D#', E:'F', F:'F#', G:'G#', A:'A#', B:'B#'},
-    'C#':{C:'C#', D:'D#', E:'E#', F:'F#', G:'G#', A:'A#', B:'B#'},
-    F:   {C:'C', D:'D', E:'E', F:'F', G:'G', A:'A', B:'Bb'},
-    Bb:  {C:'C', D:'D', E:'Eb', F:'F', G:'G', A:'A', B:'Bb'},
-    Eb:  {C:'C', D:'D', E:'Eb', F:'F', G:'G', A:'Ab', B:'Bb'},
-    Ab:  {C:'C', D:'Db', E:'Eb', F:'F', G:'G', A:'Ab', B:'Bb'},
-    Db:  {C:'C', D:'Db', E:'Eb', F:'F', G:'Gb', A:'Ab', B:'Bb'},
-    Gb:  {C:'C', D:'Db', E:'Eb', F:'F', G:'Gb', A:'Ab', B:'Cb'},
-    Cb:  {C:'Cb', D:'Db', E:'Eb', F:'Fb', G:'Gb', A:'Ab', B:'Cb'}
+  // YOUR SCALE TABLE — FUNCTIONAL
+  const KEY_SCALES = {
+    C:  ["C","D","E","F","G","A","B"],
+    G:  ["G","A","B","C","D","E","F#"],
+    D:  ["D","E","F#","G","A","B","C#"],
+    A:  ["A","B","C#","D","E","F#","G#"],
+    E:  ["E","F#","G#","A","B","C#","D#"],
+    B:  ["B","C#","D#","E","F#","G#","A#"],
+    F#: ["F#","G#","A#","B","C#","D#","E#"],
+    C#: ["C#","D#","E#","F#","G#","A#","B#"],
+
+    F:  ["F","G","A","Bb","C","D","E"],
+    Bb: ["Bb","C","D","Eb","F","G","A"],
+    Eb: ["Eb","F","G","Ab","Bb","C","D"],
+    Ab: ["Ab","Bb","C","Db","Eb","F","Gb"],
+    Db: ["Db","Eb","F","Gb","Ab","Bb","C"],
+    Gb: ["Gb","Ab","Bb","C","Db","Eb","F"],
+    Cb: ["Cb","Db","Eb","Fb","Gb","Ab","Bb"]
   };
 
-  const letterIndex = {C:0,D:1,E:2,F:3,G:4,A:5,B:6};
+  const STAFF_INDEX = { C:0, D:1, E:2, F:3, G:4, A:5, B:6 };
+
+  const ENHARMONIC = {
+    "C#":"Db","Db":"C#",
+    "D#":"Eb","Eb":"D#",
+    "E":"Fb","Fb":"E",
+    "E#":"F","F":"E#",
+    "F#":"Gb","Gb":"F#",
+    "G#":"Ab","Ab":"G#",
+    "A#":"Bb","Bb":"A#",
+    "B":"Cb","Cb":"B",
+    "B#":"C","C":"B#"
+  };
+
+  let keySignature = "C";
+
+  /* =======================
+     HELPERS
+  ======================= */
 
   function parseNote(n) {
     const m = /^([A-G])([#b]?)(-?\d+)$/.exec(n);
@@ -133,11 +152,27 @@
     return { letter:m[1], accidental:m[2], octave:+m[3] };
   }
 
-  function diatonicStep(n) {
-    return n.octave * 7 + letterIndex[n.letter];
+  function pitchClass(n) {
+    return n.replace(/\d+/g,"");
   }
 
-  const REF = diatonicStep({letter:"E", octave:4});
+  function enharmonicEqual(a,b){
+    return a === b || ENHARMONIC[a] === b;
+  }
+
+  function findScaleDegree(pitch, key) {
+    const scale = KEY_SCALES[key];
+    for (let i=0;i<7;i++) {
+      if (enharmonicEqual(scale[i], pitch)) return i;
+    }
+    return null;
+  }
+
+  function staffStep(letter, octave) {
+    return octave * 7 + STAFF_INDEX[letter];
+  }
+
+  const REF = staffStep("E", 4);
 
   /* =======================
      STATIC DRAW
@@ -157,7 +192,6 @@
 
   function drawStatic() {
     staticGroup.innerHTML = "";
-
     drawLines(trebleTop);
     drawLines(bassTop);
 
@@ -194,20 +228,18 @@
     const n = parseNote(name);
     if (!n) return;
 
-    // --- Map piano letter to staff letter per key ---
-    const staffLetterRaw = STAFF_MAPPING[keySignature][n.letter] || n.letter;
-    const staffLetter = staffLetterRaw.replace(/[b#]/,'');
-    const accidentalStaff = staffLetterRaw.includes('#') ? '#' :
-                            staffLetterRaw.includes('b') ? 'b' : '';
+    const pitch = pitchClass(name);
+    const degree = findScaleDegree(pitch, keySignature);
+    if (degree === null) return;
 
-    // create new note object for diatonic calculation
-    const nStaff = {letter:staffLetter, octave:n.octave};
-    const step = diatonicStep(nStaff) - REF;
+    const scaleSpelling = KEY_SCALES[keySignature][degree];
+    const staffLetter = scaleSpelling[0];
+
+    const step = staffStep(staffLetter, n.octave) - REF;
     const y = trebleBottom - step * half;
 
     if (y < trebleTop)
       for (let yy=trebleTop-lineSpacing; yy>=y; yy-=lineSpacing) ledger(yy);
-
     if (y > bassBottom)
       for (let yy=bassBottom+lineSpacing; yy<=y; yy+=lineSpacing) ledger(yy);
 
@@ -229,20 +261,13 @@
     stem.setAttribute("stroke","#000");
     notesGroup.appendChild(stem);
 
-    // --- Determine if accidental is displayed ---
-    let acc = "";
-    if (n.accidental) {
-      if (n.accidental !== accidentalStaff)
-        acc = n.accidental === "#" ? "♯" : "♭";
-    } else if (accidentalStaff) acc = "♮";
-
-    if (acc) {
-      const t = document.createElementNS(SVG_NS,"text");
-      t.setAttribute("x",noteX-18);
-      t.setAttribute("y",y+4);
-      t.setAttribute("font-size",12);
-      t.textContent = acc;
-      notesGroup.appendChild(t);
+    if (pitch !== scaleSpelling) {
+      const acc = document.createElementNS(SVG_NS,"text");
+      acc.setAttribute("x", noteX-18);
+      acc.setAttribute("y", y+4);
+      acc.setAttribute("font-size", 12);
+      acc.textContent = "♮";
+      notesGroup.appendChild(acc);
     }
   }
 
