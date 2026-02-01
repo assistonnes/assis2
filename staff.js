@@ -1,197 +1,153 @@
-// staff.js — self-contained, DOM-safe
-document.addEventListener("DOMContentLoaded", () => {
-(function () {
+/* ===========================
+   STAFF.JS – CLEAN REWRITE
+   =========================== */
 
-  /* =======================
-     CSS (UNCHANGED)
-  ======================= */
-  const css = `
-  #controls-wrapper {
-    position: relative;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 10px;
+/* ---------- CONFIG ---------- */
+
+const STAFF_CONFIG = {
+  lineSpacing: 12,
+  staffTop: 40,
+  noteRadius: 5,
+};
+
+/* ---------- KEY SIGNATURE TABLES ---------- */
+
+const KEY_SIGNATURES = {
+  C:  ["C", "D", "E", "F", "G", "A", "B"],
+  G:  ["G", "A", "B", "C", "D", "E", "F#"],
+  D:  ["D", "E", "F#", "G", "A", "B", "C#"],
+  A:  ["A", "B", "C#", "D", "E", "F#", "G#"],
+  E:  ["E", "F#", "G#", "A", "B", "C#", "D#"],
+  B:  ["B", "C#", "D#", "E", "F#", "G#", "A#"],
+  "F#": ["F#", "G#", "A#", "B", "C#", "D#", "E#"],
+  "C#": ["C#", "D#", "E#", "F#", "G#", "A#", "B#"],
+
+  F:  ["F", "G", "A", "Bb", "C", "D", "E"],
+  Bb: ["Bb", "C", "D", "Eb", "F", "G", "A"],
+  Eb: ["Eb", "F", "G", "Ab", "Bb", "C", "D"],
+  Ab: ["Ab", "Bb", "C", "Db", "Eb", "F", "Gb"],
+  Db: ["Db", "Eb", "F", "Gb", "Ab", "Bb", "C"],
+  Gb: ["Gb", "Ab", "Bb", "C", "Db", "Eb", "F"],
+  Cb: ["Cb", "Db", "Eb", "Fb", "Gb", "Ab", "Bb"],
+};
+
+/* ---------- STAFF POSITIONS (TREBLE CLEF) ---------- */
+/* Reference: E4 = bottom line */
+
+const STAFF_POSITIONS = {
+  C: -6,
+  D: -5,
+  E: -4,
+  F: -3,
+  G: -2,
+  A: -1,
+  B:  0,
+};
+
+/* ---------- CANVAS SETUP ---------- */
+
+const canvas = document.createElement("canvas");
+canvas.width = 600;
+canvas.height = 180;
+canvas.id = "staff-canvas";
+document.body.appendChild(canvas);
+
+const ctx = canvas.getContext("2d");
+
+/* ---------- DRAW STAFF ---------- */
+
+function drawStaff() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  for (let i = 0; i < 5; i++) {
+    const y = STAFF_CONFIG.staffTop + i * STAFF_CONFIG.lineSpacing;
+    ctx.beginPath();
+    ctx.moveTo(20, y);
+    ctx.lineTo(canvas.width - 20, y);
+    ctx.stroke();
   }
-  #key-select-wrapper {
-    position: absolute;
-    right: 50%;
-    transform: translate(-160%, -50%);
-    top: 50%;
-    min-width: 60px;
-    text-align: right;
-    z-index: 10;
-    font-family: system-ui, sans-serif;
-    font-size: 14px;
-  }
-  #image-placeholder {
-    transform: translate(-8%, 0%);
-    width: 150px;
-    height: 130px;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    margin: 0 auto;
-    position: relative;
-  }
-  #image-placeholder svg {
-    width: 100%;
-    height: 100%;
-  }
-  `;
-  const style = document.createElement("style");
-  style.textContent = css;
-  document.head.appendChild(style);
+}
 
-  /* =======================
-     HTML
-  ======================= */
-  const wrapper = document.createElement("div");
-  wrapper.id = "controls-wrapper";
-  wrapper.innerHTML = `
-    <div id="key-select-wrapper">
-      Key:
-      <select id="key-selector">
-        <option>C</option><option>G</option><option>D</option><option>A</option>
-        <option>E</option><option>B</option><option>F#</option><option>C#</option>
-        <option>F</option><option>Bb</option><option>Eb</option><option>Ab</option>
-        <option>Db</option><option>Gb</option><option>Cb</option>
-      </select>
-    </div>
-    <div id="image-placeholder"></div>
-  `;
-  document.body.prepend(wrapper);
+drawStaff();
 
-  const container = document.getElementById("image-placeholder");
-  if (!container) {
-    console.error("staff.js: image-placeholder not found");
-    return;
-  }
+/* ---------- UTILITIES ---------- */
 
-  /* =======================
-     SVG SETUP
-  ======================= */
-  const SVG_NS = "http://www.w3.org/2000/svg";
-  const W = 230, H = 230;
+function parseNote(note) {
+  const match = note.match(/^([A-G])([b#]?)(\d)$/);
+  if (!match) return null;
 
-  const svg = document.createElementNS(SVG_NS, "svg");
-  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
-  container.appendChild(svg);
+  return {
+    letter: match[1],
+    accidental: match[2] || "",
+    octave: parseInt(match[3], 10),
+  };
+}
 
-  const staticGroup = document.createElementNS(SVG_NS, "g");
-  const notesGroup = document.createElementNS(SVG_NS, "g");
-  svg.appendChild(staticGroup);
-  svg.appendChild(notesGroup);
+function normalizePitch(note) {
+  const enharmonics = {
+    "E#": "F",
+    "B#": "C",
+    "Cb": "B",
+    "Fb": "E",
+  };
+  return enharmonics[note] || note;
+}
 
-  /* =======================
-     LAYOUT
-  ======================= */
-  const leftMargin = 48;
-  const rightMargin = W - 20;
-  const lineSpacing = 16;
-  const half = lineSpacing / 2;
+/* ---------- MAP PIANO NOTE → STAFF NOTE ---------- */
 
-  const totalHeight = 4*lineSpacing + 2*lineSpacing + 4*lineSpacing;
-  const topMargin = (H - totalHeight) / 2;
+function mapToKeySignature(noteName, key) {
+  const keyScale = KEY_SIGNATURES[key];
+  if (!keyScale) return noteName;
 
-  const trebleTop = topMargin;
-  const trebleBottom = trebleTop + 4 * lineSpacing;
-  const bassTop = trebleBottom + 2 * lineSpacing;
-  const bassBottom = bassTop + 4 * lineSpacing;
+  const baseLetter = noteName[0];
+  const normalized = normalizePitch(noteName.slice(0, -1));
 
-  const noteX = W / 2 + 30;
-
-  /* =======================
-     THEORY
-  ======================= */
-  let keySignature = "C";
-
-  const letterIndex = { C:0, D:1, E:2, F:3, G:4, A:5, B:6 };
-
-  function parseNote(n) {
-    const m = /^([A-G])([#b]?)(-?\d+)$/.exec(n);
-    if (!m) return null;
-    return { letter:m[1], accidental:m[2], octave:+m[3] };
-  }
-
-  function diatonicStep(n) {
-    return n.octave * 7 + letterIndex[n.letter];
-  }
-
-  const REF = diatonicStep({letter:"E", octave:4});
-
-  /* =======================
-     STATIC DRAW
-  ======================= */
-  function drawLines(topY) {
-    for (let i=0;i<5;i++) {
-      const y = topY + i*lineSpacing;
-      const l = document.createElementNS(SVG_NS,"line");
-      l.setAttribute("x1", leftMargin-36);
-      l.setAttribute("x2", rightMargin);
-      l.setAttribute("y1", y);
-      l.setAttribute("y2", y);
-      l.setAttribute("stroke","#000");
-      staticGroup.appendChild(l);
+  for (const scaleNote of keyScale) {
+    if (normalizePitch(scaleNote) === normalized) {
+      return scaleNote;
     }
   }
 
-  function drawStatic() {
-    staticGroup.innerHTML = "";
-    drawLines(trebleTop);
-    drawLines(bassTop);
+  return noteName;
+}
 
-    const treble = document.createElementNS(SVG_NS,"text");
-    treble.setAttribute("x", leftMargin-34);
-    treble.setAttribute("y", trebleBottom);
-    treble.setAttribute("font-size", 60);
-    treble.textContent = "𝄞";
-    staticGroup.appendChild(treble);
+/* ---------- DRAW NOTE ---------- */
 
-    const bass = document.createElementNS(SVG_NS,"text");
-    bass.setAttribute("x", leftMargin-34);
-    bass.setAttribute("y", bassBottom-8);
-    bass.setAttribute("font-size", 60);
-    bass.textContent = "𝄢";
-    staticGroup.appendChild(bass);
+function drawNote(noteName) {
+  drawStaff();
+
+  const key = window.currentKey || "C";
+  const parsed = parseNote(noteName);
+  if (!parsed) return;
+
+  const staffNote = mapToKeySignature(noteName.slice(0, -1), key);
+
+  const letter = staffNote[0];
+  const accidental = staffNote.slice(1);
+
+  const baseOffset = STAFF_POSITIONS[letter];
+  const octaveOffset = (parsed.octave - 4) * 7;
+
+  const y =
+    STAFF_CONFIG.staffTop +
+    4 * STAFF_CONFIG.lineSpacing -
+    (baseOffset + octaveOffset) * (STAFF_CONFIG.lineSpacing / 2);
+
+  const x = 120;
+
+  // Draw note head
+  ctx.beginPath();
+  ctx.ellipse(x, y, STAFF_CONFIG.noteRadius, STAFF_CONFIG.noteRadius - 1, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Draw accidental if needed
+  if (accidental) {
+    ctx.font = "16px serif";
+    ctx.fillText(accidental === "#" ? "♯" : "♭", x - 14, y + 5);
   }
+}
 
-  /* =======================
-     NOTE DRAW (still simple for now)
-  ======================= */
-  function renderNote(name) {
-    notesGroup.innerHTML = "";
-    const n = parseNote(name);
-    if (!n) return;
+/* ---------- PUBLIC API ---------- */
+/* 🔧 CHANGE THIS NAME IF YOUR PIANO USES A DIFFERENT HOOK */
 
-    const step = diatonicStep(n) - REF;
-    const y = trebleBottom - step * half;
-
-    const head = document.createElementNS(SVG_NS,"ellipse");
-    head.setAttribute("cx",noteX);
-    head.setAttribute("cy",y);
-    head.setAttribute("rx",9);
-    head.setAttribute("ry",6);
-    head.setAttribute("transform",`rotate(-20 ${noteX} ${y})`);
-    head.setAttribute("fill","#000");
-    notesGroup.appendChild(head);
-  }
-
-  /* =======================
-     API
-  ======================= */
-  window.staffDrawNote = n => renderNote(n);
-  window.staffSetKey = k => { keySignature = k; drawStatic(); };
-
-  document.getElementById("key-selector")
-    .addEventListener("change", e => staffSetKey(e.target.value));
-
-  drawStatic();
-
-})();
-});
+window.drawStaffNote = drawNote;
