@@ -421,14 +421,17 @@ const KEY_MAP = {
     head.setAttribute("fill","#000");
     notesGroup.appendChild(head);
 
-    if (acc) {
-      const t = document.createElementNS(SVG_NS,"text");
-      t.setAttribute("x",noteX-22);
-      t.setAttribute("y",y+4);
-      t.setAttribute("font-size",12);
-      t.textContent = acc === "##" ? "𝄪" : acc === "#" ? "♯" : acc === "b" ? "♭" : "♮";
-      notesGroup.appendChild(t);
-    }
+    if (acc !== "") {
+  const t = document.createElementNS(SVG_NS,"text");
+  t.setAttribute("x",noteX-22);
+  t.setAttribute("y",y+4);
+  t.setAttribute("font-size",12);
+  t.textContent =
+    acc === "##" ? "𝄪" :
+    acc === "#"  ? "♯" :
+    acc === "b"  ? "♭" : "♮";
+  notesGroup.appendChild(t);
+}
   }
 
   /* =======================
@@ -466,7 +469,11 @@ window.staffDrawNote = function(noteName) {
   if (!r) return;
   renderNote(r.id, r.octave);
 };
-  window.staffSetKey = k => { keySignature = k; drawStatic(); };
+  window.staffSetKey = k => {
+  currentKey = k;
+  notesGroup.innerHTML = ""; // hard reset notes
+  drawStatic();
+};
 
   document.getElementById("key-selector").addEventListener("change", e => {
     staffSetKey(e.target.value);
