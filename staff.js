@@ -136,7 +136,7 @@
   const KEY_MAP = {
 
     C: {
-      a:{slot:"C",acc:"#"},  b:{slot:"C",acc:"#"},
+      a:{slot:"C",acc:""},  b:{slot:"C",acc:"#"},
       c:{slot:"D",acc:""},  d:{slot:"D",acc:"#"},
       e:{slot:"E",acc:""},
       f:{slot:"F",acc:""},  g:{slot:"F",acc:"#"},
@@ -144,20 +144,23 @@
       j:{slot:"A",acc:""},  k:{slot:"A",acc:"#"},
       l:{slot:"B",acc:""}
     },
- G:   {C:'C', D:'D', E:'E', F:'F#', G:'G', A:'A', B:'B'},
-    D:   {C:'C#', D:'D', E:'E', F:'F#', G:'G', A:'A', B:'B'},
-    A:   {C:'C#', D:'D', E:'E', F:'F#', G:'G#', A:'A', B:'B'},
-    E:   {C:'C#', D:'D#', E:'E', F:'F#', G:'G#', A:'A', B:'B'},
-    B:   {C:'C#', D:'D#', E:'E', F:'F#', G:'G#', A:'A#', B:'B'},
-    'F#':{C:'C#', D:'D#', E:'E#', F:'F#', G:'G#', A:'A#', B:'B#'},
-    'C#':{C:'C#', D:'D#', E:'E#', F:'F#', G:'G#', A:'A#', B:'B#'},
-    F:   {C:'C', D:'D', E:'E', F:'F', G:'G', A:'A', B:'Bb'},
-    Bb:  {C:'C', D:'D', E:'Eb', F:'F', G:'G', A:'A', B:'Bb'},
-    Eb:  {C:'C', D:'D', E:'Eb', F:'F', G:'G', A:'Ab', B:'Bb'},
-    Ab:  {C:'C', D:'Db', E:'Eb', F:'F', G:'G', A:'Ab', B:'Bb'},
-    Db:  {C:'C', D:'Db', E:'Eb', F:'F', G:'Gb', A:'Ab', B:'Bb'},
-    Gb:  {C:'C', D:'Db', E:'Eb', F:'F', G:'Gb', A:'Ab', B:'Cb'},
-    Cb:  {C:'Cb', D:'Db', E:'Eb', F:'Fb', G:'Gb', A:'Ab', B:'Cb'}
+
+    "F#": {
+      a:{slot:"C",acc:"#"},
+      b:{slot:"C",acc:"##"},
+      c:{slot:"D",acc:"#"},
+      d:{slot:"D",acc:"##"},
+      e:{slot:"E",acc:"#"},   // E#
+      f:{slot:"E",acc:"#"},   // F → E#
+      g:{slot:"F",acc:"#"},
+      h:{slot:"G",acc:"#"},
+      i:{slot:"G",acc:"##"},
+      j:{slot:"A",acc:"#"},
+      k:{slot:"A",acc:"##"},
+      l:{slot:"B",acc:"#"}
+    }
+
+    // 👉 YOU ADD MORE KEYS HERE
   };
 
   let currentKey = "C";
