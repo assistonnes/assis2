@@ -209,18 +209,18 @@ const KEY_MAP = {
   },
 
   "F#": {
-    a:{slot:"C",acc:"#"},
+    a:{slot:"C",acc:"b"},
     b:{slot:"C",acc:""},
-    c:{slot:"D",acc:"#"},
-    d:{slot:"D",acc:"##"},
-    e:{slot:"E",acc:"#"},   // E#
+    c:{slot:"D",acc:"b"},
+    d:{slot:"D",acc:""},
+    e:{slot:"E",acc:"b"},  
     f:{slot:"E",acc:"#"},   // F → E#
     g:{slot:"F",acc:""},
-    h:{slot:"G",acc:"#"},
-    i:{slot:"G",acc:"##"},
-    j:{slot:"A",acc:"#"},
-    k:{slot:"A",acc:"##"},
-    l:{slot:"B",acc:"#"}
+    h:{slot:"G",acc:"b"},
+    i:{slot:"G",acc:""},
+    j:{slot:"A",acc:"b"},
+    k:{slot:"A",acc:""},
+    l:{slot:"B",acc:""}
   },
 
   "C#": {
