@@ -252,11 +252,47 @@
   /* =======================
      API
   ======================= */
-  window.staffDrawPiano = (id, octave=4) => renderNote(id, octave);
-  window.staffSetKey = k => { currentKey = k; drawStatic(); notesGroup.innerHTML=""; };
+  // BACKWARD-COMPATIBILITY BRIDGE
+// Accept original piano.js calls like "C#4", "F3", etc.
+
+function noteNameToPianoId(name) {
+  const m = /^([A-G])([#b]?)(\d+)$/.exec(name);
+  if (!m) return null;
+
+  const letter = m[1];
+  const acc = m[2];
+  const octave = +m[3];
+
+  const key = letter + (acc === "#" ? "SH" : acc === "b" ? "FL" : "");
+
+  const map = {
+    C: "a", CSH: "b",
+    D: "c", DSH: "d",
+    E: "e",
+    F: "f", FSH: "g",
+    G: "h", GSH: "i",
+    A: "j", ASH: "k",
+    B: "l"
+  };
+
+  return { id: map[key], octave };
+}
+
+// RESTORE ORIGINAL API
+window.staffDrawNote = function(noteName) {
+  const r = noteNameToPianoId(noteName);
+  if (!r) return;
+  renderNote(r.id, r.octave);
+};
+  window.staffSetKey = k => { keySignature = k; drawStatic(); };
 
   document.getElementById("key-selector").addEventListener("change", e => {
     staffSetKey(e.target.value);
+  });
+
+  window.addEventListener("resize", () => {
+    drawStatic();
+    notesGroup.innerHTML = "";
   });
 
   drawStatic();
