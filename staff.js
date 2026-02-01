@@ -146,7 +146,7 @@
     },
 
     "F#": {
-      a:{slot:"C",acc:"#"},
+      a:{slot:"C",acc:"b"},
       b:{slot:"C",acc:"##"},
       c:{slot:"D",acc:"#"},
       d:{slot:"D",acc:"##"},
