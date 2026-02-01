@@ -215,7 +215,7 @@ const KEY_MAP = {
     d:{slot:"D",acc:"##"},
     e:{slot:"E",acc:"#"},   // E#
     f:{slot:"E",acc:"#"},   // F → E#
-    g:{slot:"F",acc:"#"},
+    g:{slot:"F",acc:""},
     h:{slot:"G",acc:"#"},
     i:{slot:"G",acc:"##"},
     j:{slot:"A",acc:"#"},
