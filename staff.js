@@ -1,5 +1,7 @@
-// staff.js — self-contained, FIXED enharmonic spelling per key
+// staff.js — self-contained, DOM-safe
+document.addEventListener("DOMContentLoaded", () => {
 (function () {
+
   /* =======================
      CSS (UNCHANGED)
   ======================= */
@@ -47,7 +49,7 @@
   document.head.appendChild(style);
 
   /* =======================
-     HTML (UNCHANGED)
+     HTML
   ======================= */
   const wrapper = document.createElement("div");
   wrapper.id = "controls-wrapper";
@@ -66,10 +68,13 @@
   document.body.prepend(wrapper);
 
   const container = document.getElementById("image-placeholder");
-  if (!container) return;
+  if (!container) {
+    console.error("staff.js: image-placeholder not found");
+    return;
+  }
 
   /* =======================
-     SVG SETUP (UNCHANGED)
+     SVG SETUP
   ======================= */
   const SVG_NS = "http://www.w3.org/2000/svg";
   const W = 230, H = 230;
@@ -84,7 +89,7 @@
   svg.appendChild(notesGroup);
 
   /* =======================
-     LAYOUT (UNCHANGED)
+     LAYOUT
   ======================= */
   const leftMargin = 48;
   const rightMargin = W - 20;
@@ -102,36 +107,11 @@
   const noteX = W / 2 + 30;
 
   /* =======================
-     THEORY — FIXED
+     THEORY
   ======================= */
   let keySignature = "C";
 
   const letterIndex = { C:0, D:1, E:2, F:3, G:4, A:5, B:6 };
-
-  const PITCH_CLASS = {
-    C:0,"C#":1,Db:1,D:2,"D#":3,Eb:3,E:4,
-    F:5,"F#":6,Gb:6,G:7,"G#":8,Ab:8,
-    A:9,"A#":10,Bb:10,B:11,Cb:11,E#:5,Fb:4,B#:0
-  };
-
-  // KEY → pitch-class → spelled note
-  const SPELLING = {
-    C:  ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"],
-    G:  ["C","C#","D","D#","E","F#","F#","G","G#","A","A#","B"],
-    D:  ["C#","C#","D","D#","E","F#","F#","G","G#","A","A#","B"],
-    A:  ["C#","C#","D","D#","E","F#","F#","G#","G#","A","A#","B"],
-    E:  ["C#","C#","D#","D#","E","F#","F#","G#","G#","A","A#","B"],
-    B:  ["C#","C#","D#","D#","E","F#","F#","G#","G#","A#","A#","B"],
-    "F#":["B#","C#","D#","D#","E#","E#","F#","G#","G#","A#","A#","B"],
-    "C#":["B#","C#","D#","D#","E#","E#","F#","G#","G#","A#","A#","B#"],
-    F:  ["C","C#","D","Eb","E","F","F#","G","Ab","A","Bb","B"],
-    Bb: ["C","C#","D","Eb","E","F","F#","G","Ab","A","Bb","B"],
-    Eb: ["C","Db","D","Eb","E","F","Gb","G","Ab","A","Bb","B"],
-    Ab: ["C","Db","D","Eb","E","F","Gb","G","Ab","A","Bb","B"],
-    Db: ["C","Db","D","Eb","E","F","Gb","G","Ab","A","Bb","Cb"],
-    Gb: ["Cb","Db","D","Eb","E","F","Gb","G","Ab","A","Bb","Cb"],
-    Cb: ["Cb","Db","D","Eb","Fb","F","Gb","G","Ab","A","Bb","Cb"]
-  };
 
   function parseNote(n) {
     const m = /^([A-G])([#b]?)(-?\d+)$/.exec(n);
@@ -146,7 +126,7 @@
   const REF = diatonicStep({letter:"E", octave:4});
 
   /* =======================
-     STATIC DRAW (UNCHANGED)
+     STATIC DRAW
   ======================= */
   function drawLines(topY) {
     for (let i=0;i<5;i++) {
@@ -182,20 +162,14 @@
   }
 
   /* =======================
-     NOTE DRAW — FIXED
+     NOTE DRAW (still simple for now)
   ======================= */
   function renderNote(name) {
     notesGroup.innerHTML = "";
-    const raw = parseNote(name);
-    if (!raw) return;
+    const n = parseNote(name);
+    if (!n) return;
 
-    const pc = PITCH_CLASS[raw.letter + raw.accidental];
-    const spelled = SPELLING[keySignature][pc];
-
-    const letter = spelled[0];
-    const accidental = spelled.slice(1);
-
-    const step = diatonicStep({letter, octave:raw.octave}) - REF;
+    const step = diatonicStep(n) - REF;
     const y = trebleBottom - step * half;
 
     const head = document.createElementNS(SVG_NS,"ellipse");
@@ -206,15 +180,6 @@
     head.setAttribute("transform",`rotate(-20 ${noteX} ${y})`);
     head.setAttribute("fill","#000");
     notesGroup.appendChild(head);
-
-    if (accidental) {
-      const t = document.createElementNS(SVG_NS,"text");
-      t.setAttribute("x",noteX-18);
-      t.setAttribute("y",y+4);
-      t.setAttribute("font-size",12);
-      t.textContent = accidental === "#" ? "♯" : accidental === "b" ? "♭" : "♮";
-      notesGroup.appendChild(t);
-    }
   }
 
   /* =======================
@@ -227,4 +192,6 @@
     .addEventListener("change", e => staffSetKey(e.target.value));
 
   drawStatic();
+
 })();
+});
