@@ -304,9 +304,9 @@ const KEY_MAP = {
     c:{slot:"D",acc:"b"},
     d:{slot:"E",acc:""},
     e:{slot:"E",acc:"b"},
-    f:{slot:"G",acc:"b"},
+    f:{slot:"F",acc:""},
     g:{slot:"G",acc:""},
-    h:{slot:"A",acc:"b"},
+    h:{slot:"G",acc:"b"},
     i:{slot:"A",acc:""},
     j:{slot:"B",acc:"b"},
     k:{slot:"B",acc:""},
@@ -432,12 +432,12 @@ if (stemUp) {
   stem.setAttribute("x1", noteX + 8);
   stem.setAttribute("x2", noteX + 8);
   stem.setAttribute("y1", y);
-  stem.setAttribute("y2", y - 3.5 * lineSpacing);
+  stem.setAttribute("y2", y - 2.5 * lineSpacing);
 } else {
   stem.setAttribute("x1", noteX - 8);
   stem.setAttribute("x2", noteX - 8);
   stem.setAttribute("y1", y);
-  stem.setAttribute("y2", y + 3.5 * lineSpacing);
+  stem.setAttribute("y2", y + 2.5 * lineSpacing);
 }
 
 stem.setAttribute("stroke", "#000");
