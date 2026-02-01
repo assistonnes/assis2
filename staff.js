@@ -214,7 +214,7 @@ const KEY_MAP = {
     c:{slot:"D",acc:"b"},
     d:{slot:"D",acc:""},
     e:{slot:"E",acc:"b"},  
-    f:{slot:"E",acc:"#"},   // F → E#
+    f:{slot:"E",acc:""},   // F → E#
     g:{slot:"F",acc:""},
     h:{slot:"G",acc:"b"},
     i:{slot:"G",acc:""},
@@ -299,11 +299,11 @@ const KEY_MAP = {
   },
 
   Db: {
-    a:{slot:"D",acc:"b"},
+    a:{slot:"C",acc:""},
     b:{slot:"D",acc:""},
-    c:{slot:"E",acc:"b"},
+    c:{slot:"D",acc:"b"},
     d:{slot:"E",acc:""},
-    e:{slot:"F",acc:""},
+    e:{slot:"E",acc:"b"},
     f:{slot:"G",acc:"b"},
     g:{slot:"G",acc:""},
     h:{slot:"A",acc:"b"},
@@ -420,6 +420,29 @@ const KEY_MAP = {
     head.setAttribute("transform",`rotate(-20 ${noteX} ${y})`);
     head.setAttribute("fill","#000");
     notesGroup.appendChild(head);
+
+// ===== STEM =====
+const stem = document.createElementNS(SVG_NS, "line");
+
+// simple rule: above middle line → stem down, else stem up
+const middleLineY = trebleTop + 2 * lineSpacing;
+const stemUp = y > middleLineY;
+
+if (stemUp) {
+  stem.setAttribute("x1", noteX + 8);
+  stem.setAttribute("x2", noteX + 8);
+  stem.setAttribute("y1", y);
+  stem.setAttribute("y2", y - 3.5 * lineSpacing);
+} else {
+  stem.setAttribute("x1", noteX - 8);
+  stem.setAttribute("x2", noteX - 8);
+  stem.setAttribute("y1", y);
+  stem.setAttribute("y2", y + 3.5 * lineSpacing);
+}
+
+stem.setAttribute("stroke", "#000");
+stem.setAttribute("stroke-width", "1.2");
+notesGroup.appendChild(stem);
 
     if (acc !== "") {
   const t = document.createElementNS(SVG_NS,"text");
