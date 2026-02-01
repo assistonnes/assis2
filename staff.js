@@ -1,6 +1,5 @@
-// staff.js — per-key enharmonic mapping, geometry-safe
+// staff.js — self-contained, FIXED enharmonic spelling per key
 (function () {
-
   /* =======================
      CSS (UNCHANGED)
   ======================= */
@@ -48,7 +47,7 @@
   document.head.appendChild(style);
 
   /* =======================
-     HTML
+     HTML (UNCHANGED)
   ======================= */
   const wrapper = document.createElement("div");
   wrapper.id = "controls-wrapper";
@@ -70,7 +69,7 @@
   if (!container) return;
 
   /* =======================
-     SVG SETUP
+     SVG SETUP (UNCHANGED)
   ======================= */
   const SVG_NS = "http://www.w3.org/2000/svg";
   const W = 230, H = 230;
@@ -85,14 +84,14 @@
   svg.appendChild(notesGroup);
 
   /* =======================
-     LAYOUT
+     LAYOUT (UNCHANGED)
   ======================= */
   const leftMargin = 48;
   const rightMargin = W - 20;
   const lineSpacing = 16;
   const half = lineSpacing / 2;
 
-  const totalHeight = 10 * lineSpacing;
+  const totalHeight = 4*lineSpacing + 2*lineSpacing + 4*lineSpacing;
   const topMargin = (H - totalHeight) / 2;
 
   const trebleTop = topMargin;
@@ -103,125 +102,103 @@
   const noteX = W / 2 + 30;
 
   /* =======================
-     PER-KEY TABLES (FIXED)
+     THEORY — FIXED
   ======================= */
-  const KEY_SCALES = {
-    "C":  ["C","D","E","F","G","A","B"],
-    "G":  ["G","A","B","C","D","E","F#"],
-    "D":  ["D","E","F#","G","A","B","C#"],
-    "A":  ["A","B","C#","D","E","F#","G#"],
-    "E":  ["E","F#","G#","A","B","C#","D#"],
-    "B":  ["B","C#","D#","E","F#","G#","A#"],
-    "F#": ["F#","G#","A#","B","C#","D#","E#"],
-    "C#": ["C#","D#","E#","F#","G#","A#","B#"],
-    "F":  ["F","G","A","Bb","C","D","E"],
-    "Bb": ["Bb","C","D","Eb","F","G","A"],
-    "Eb": ["Eb","F","G","Ab","Bb","C","D"],
-    "Ab": ["Ab","Bb","C","Db","Eb","F","Gb"],
-    "Db": ["Db","Eb","F","Gb","Ab","Bb","C"],
-    "Gb": ["Gb","Ab","Bb","C","Db","Eb","F"],
-    "Cb": ["Cb","Db","Eb","Fb","Gb","Ab","Bb"]
-  };
-
-  const STAFF_INDEX = { C:0, D:1, E:2, F:3, G:4, A:5, B:6 };
   let keySignature = "C";
 
+  const letterIndex = { C:0, D:1, E:2, F:3, G:4, A:5, B:6 };
+
+  const PITCH_CLASS = {
+    C:0,"C#":1,Db:1,D:2,"D#":3,Eb:3,E:4,
+    F:5,"F#":6,Gb:6,G:7,"G#":8,Ab:8,
+    A:9,"A#":10,Bb:10,B:11,Cb:11,E#:5,Fb:4,B#:0
+  };
+
+  // KEY → pitch-class → spelled note
+  const SPELLING = {
+    C:  ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"],
+    G:  ["C","C#","D","D#","E","F#","F#","G","G#","A","A#","B"],
+    D:  ["C#","C#","D","D#","E","F#","F#","G","G#","A","A#","B"],
+    A:  ["C#","C#","D","D#","E","F#","F#","G#","G#","A","A#","B"],
+    E:  ["C#","C#","D#","D#","E","F#","F#","G#","G#","A","A#","B"],
+    B:  ["C#","C#","D#","D#","E","F#","F#","G#","G#","A#","A#","B"],
+    "F#":["B#","C#","D#","D#","E#","E#","F#","G#","G#","A#","A#","B"],
+    "C#":["B#","C#","D#","D#","E#","E#","F#","G#","G#","A#","A#","B#"],
+    F:  ["C","C#","D","Eb","E","F","F#","G","Ab","A","Bb","B"],
+    Bb: ["C","C#","D","Eb","E","F","F#","G","Ab","A","Bb","B"],
+    Eb: ["C","Db","D","Eb","E","F","Gb","G","Ab","A","Bb","B"],
+    Ab: ["C","Db","D","Eb","E","F","Gb","G","Ab","A","Bb","B"],
+    Db: ["C","Db","D","Eb","E","F","Gb","G","Ab","A","Bb","Cb"],
+    Gb: ["Cb","Db","D","Eb","E","F","Gb","G","Ab","A","Bb","Cb"],
+    Cb: ["Cb","Db","D","Eb","Fb","F","Gb","G","Ab","A","Bb","Cb"]
+  };
+
+  function parseNote(n) {
+    const m = /^([A-G])([#b]?)(-?\d+)$/.exec(n);
+    if (!m) return null;
+    return { letter:m[1], accidental:m[2], octave:+m[3] };
+  }
+
+  function diatonicStep(n) {
+    return n.octave * 7 + letterIndex[n.letter];
+  }
+
+  const REF = diatonicStep({letter:"E", octave:4});
+
   /* =======================
-     HELPERS
+     STATIC DRAW (UNCHANGED)
   ======================= */
-  function parseNote(n){
-    const m=/^([A-G])([#b]?)(-?\d+)$/.exec(n);
-    return m?{letter:m[1],acc:m[2],oct:+m[3]}:null;
-  }
-  function pitchClass(n){ return n.replace(/\d+/g,""); }
-
-  function enharmonic(a,b){
-    return a===b ||
-      (a==="F"&&b==="E#")||(a==="E#"&&b==="F")||
-      (a==="B"&&b==="Cb")||(a==="Cb"&&b==="B")||
-      (a==="C"&&b==="B#")||(a==="B#"&&b==="C")||
-      (a==="E"&&b==="Fb")||(a==="Fb"&&b==="E")||
-      (a[0]===b[0]);
-  }
-
-  function findDegree(p,key){
-    return KEY_SCALES[key].findIndex(n=>enharmonic(n,p));
-  }
-
-  function staffStep(letter,oct){
-    return oct*7 + STAFF_INDEX[letter];
-  }
-
-  const REF = staffStep("E",4);
-
-  /* =======================
-     STATIC DRAW
-  ======================= */
-  function drawLines(top){
-    for(let i=0;i<5;i++){
-      const y=top+i*lineSpacing;
-      const l=document.createElementNS(SVG_NS,"line");
-      l.setAttribute("x1",leftMargin-36);
-      l.setAttribute("x2",rightMargin);
-      l.setAttribute("y1",y);
-      l.setAttribute("y2",y);
+  function drawLines(topY) {
+    for (let i=0;i<5;i++) {
+      const y = topY + i*lineSpacing;
+      const l = document.createElementNS(SVG_NS,"line");
+      l.setAttribute("x1", leftMargin-36);
+      l.setAttribute("x2", rightMargin);
+      l.setAttribute("y1", y);
+      l.setAttribute("y2", y);
       l.setAttribute("stroke","#000");
       staticGroup.appendChild(l);
     }
   }
 
-  function drawStatic(){
-    staticGroup.innerHTML="";
+  function drawStatic() {
+    staticGroup.innerHTML = "";
     drawLines(trebleTop);
     drawLines(bassTop);
 
-    const t=document.createElementNS(SVG_NS,"text");
-    t.setAttribute("x",leftMargin-34);
-    t.setAttribute("y",trebleBottom);
-    t.setAttribute("font-size",60);
-    t.textContent="𝄞";
-    staticGroup.appendChild(t);
+    const treble = document.createElementNS(SVG_NS,"text");
+    treble.setAttribute("x", leftMargin-34);
+    treble.setAttribute("y", trebleBottom);
+    treble.setAttribute("font-size", 60);
+    treble.textContent = "𝄞";
+    staticGroup.appendChild(treble);
 
-    const b=document.createElementNS(SVG_NS,"text");
-    b.setAttribute("x",leftMargin-34);
-    b.setAttribute("y",bassBottom-8);
-    b.setAttribute("font-size",60);
-    b.textContent="𝄢";
-    staticGroup.appendChild(b);
+    const bass = document.createElementNS(SVG_NS,"text");
+    bass.setAttribute("x", leftMargin-34);
+    bass.setAttribute("y", bassBottom-8);
+    bass.setAttribute("font-size", 60);
+    bass.textContent = "𝄢";
+    staticGroup.appendChild(bass);
   }
 
   /* =======================
-     NOTE DRAW
+     NOTE DRAW — FIXED
   ======================= */
-  function ledger(y){
-    const l=document.createElementNS(SVG_NS,"line");
-    l.setAttribute("x1",noteX-18);
-    l.setAttribute("x2",noteX+18);
-    l.setAttribute("y1",y);
-    l.setAttribute("y2",y);
-    l.setAttribute("stroke","#000");
-    notesGroup.appendChild(l);
-  }
+  function renderNote(name) {
+    notesGroup.innerHTML = "";
+    const raw = parseNote(name);
+    if (!raw) return;
 
-  function renderNote(name){
-    notesGroup.innerHTML="";
-    const n=parseNote(name);
-    if(!n) return;
+    const pc = PITCH_CLASS[raw.letter + raw.accidental];
+    const spelled = SPELLING[keySignature][pc];
 
-    const pitch=pitchClass(name);
-    const deg=findDegree(pitch,keySignature);
-    if(deg<0) return;
+    const letter = spelled[0];
+    const accidental = spelled.slice(1);
 
-    const spelled=KEY_SCALES[keySignature][deg];
-    const staffLetter=spelled[0];
+    const step = diatonicStep({letter, octave:raw.octave}) - REF;
+    const y = trebleBottom - step * half;
 
-    const step=staffStep(staffLetter,n.oct)-REF;
-    const y=trebleBottom-step*half;
-
-    if(y<trebleTop) for(let yy=trebleTop-lineSpacing;yy>=y;yy-=lineSpacing) ledger(yy);
-    if(y>bassBottom) for(let yy=bassBottom+lineSpacing;yy<=y;yy+=lineSpacing) ledger(yy);
-
-    const head=document.createElementNS(SVG_NS,"ellipse");
+    const head = document.createElementNS(SVG_NS,"ellipse");
     head.setAttribute("cx",noteX);
     head.setAttribute("cy",y);
     head.setAttribute("rx",9);
@@ -230,33 +207,24 @@
     head.setAttribute("fill","#000");
     notesGroup.appendChild(head);
 
-    const stem=document.createElementNS(SVG_NS,"line");
-    const up=y>trebleTop+2*lineSpacing;
-    stem.setAttribute("x1",up?noteX-8:noteX+8);
-    stem.setAttribute("y1",y);
-    stem.setAttribute("x2",up?noteX-8:noteX+8);
-    stem.setAttribute("y2",y+(up?36:-36));
-    stem.setAttribute("stroke","#000");
-    notesGroup.appendChild(stem);
-
-    if(pitch!==spelled){
-      const a=document.createElementNS(SVG_NS,"text");
-      a.setAttribute("x",noteX-18);
-      a.setAttribute("y",y+4);
-      a.setAttribute("font-size",12);
-      a.textContent="♮";
-      notesGroup.appendChild(a);
+    if (accidental) {
+      const t = document.createElementNS(SVG_NS,"text");
+      t.setAttribute("x",noteX-18);
+      t.setAttribute("y",y+4);
+      t.setAttribute("font-size",12);
+      t.textContent = accidental === "#" ? "♯" : accidental === "b" ? "♭" : "♮";
+      notesGroup.appendChild(t);
     }
   }
 
   /* =======================
      API
   ======================= */
-  window.staffDrawNote=n=>renderNote(n);
-  window.staffSetKey=k=>{ keySignature=k; drawStatic(); };
+  window.staffDrawNote = n => renderNote(n);
+  window.staffSetKey = k => { keySignature = k; drawStatic(); };
 
   document.getElementById("key-selector")
-    .addEventListener("change",e=>staffSetKey(e.target.value));
+    .addEventListener("change", e => staffSetKey(e.target.value));
 
   drawStatic();
 })();
