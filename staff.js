@@ -1,358 +1,177 @@
-// staff.js — FULL manual mapping, zero theory automation
-(function () {
+/* =========================
+   STAFF CONFIG (DO NOT TOUCH)
+   ========================= */
 
-  /* =======================
-     CSS (SAFE, UNCHANGED)
-  ======================= */
-  const css = `
-  #controls-wrapper {
-    position: relative;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 10px;
-  }
-  #key-select-wrapper {
-    position: absolute;
-    right: 50%;
-    transform: translate(-160%, -50%);
-    top: 50%;
-    min-width: 60px;
-    text-align: right;
-    z-index: 10;
-    font-family: system-ui, sans-serif;
-    font-size: 14px;
-  }
-  #image-placeholder {
-    transform: translate(-8%, 0%);
-    width: 150px;
-    height: 130px;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    margin: 0 auto;
-    position: relative;
-  }
-  #image-placeholder svg {
-    width: 100%;
-    height: 100%;
-  }
-  `;
-  const style = document.createElement("style");
-  style.textContent = css;
-  document.head.appendChild(style);
+const STAFF = {
+  lineCount: 5,
+  lineSpacing: 12,
+  topY: 40,
+  leftX: 20,
+  width: 420,
+  noteRadius: 5
+};
 
-  /* =======================
-     HTML
-  ======================= */
-  const wrapper = document.createElement("div");
-  wrapper.id = "controls-wrapper";
-  wrapper.innerHTML = `
-    <div id="key-select-wrapper">
-      Key:
-      <select id="key-selector">
-        <option>C</option><option>G</option><option>D</option><option>A</option>
-        <option>E</option><option>B</option><option>F#</option><option>C#</option>
-        <option>F</option><option>Bb</option><option>Eb</option><option>Ab</option>
-        <option>Db</option><option>Gb</option><option>Cb</option>
-      </select>
-    </div>
-    <div id="image-placeholder"></div>
-  `;
-  document.body.prepend(wrapper);
+/* =========================
+   STAFF POSITIONS (FIXED)
+   These NEVER change.
+   ========================= */
 
-  /* =======================
-     SVG SETUP
-  ======================= */
-  const SVG_NS = "http://www.w3.org/2000/svg";
-  const W = 230, H = 230;
+// Vertical positions for staff notes (treble clef reference)
+const STAFF_POSITIONS = {
+  C:  STAFF.topY + STAFF.lineSpacing * 6,
+  D:  STAFF.topY + STAFF.lineSpacing * 5.5,
+  E:  STAFF.topY + STAFF.lineSpacing * 5,
+  F:  STAFF.topY + STAFF.lineSpacing * 4.5,
+  G:  STAFF.topY + STAFF.lineSpacing * 4,
+  A:  STAFF.topY + STAFF.lineSpacing * 3.5,
+  B:  STAFF.topY + STAFF.lineSpacing * 3
+};
 
-  const svg = document.createElementNS(SVG_NS, "svg");
-  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
-  document.getElementById("image-placeholder").appendChild(svg);
+/* =========================
+   PIANO NOTE IDENTITIES
+   12 abstract notes (octave-less)
+   DO NOT CHANGE IDs
+   ========================= */
 
-  const staticGroup = document.createElementNS(SVG_NS, "g");
-  const notesGroup = document.createElementNS(SVG_NS, "g");
-  svg.appendChild(staticGroup);
-  svg.appendChild(notesGroup);
+const PIANO_NOTES = {
+  a: "C",
+  b: "C#",
+  c: "D",
+  d: "D#",
+  e: "E",
+  f: "F",
+  g: "F#",
+  h: "G",
+  i: "G#",
+  j: "A",
+  k: "A#",
+  l: "B"
+};
 
-  /* =======================
-     STAFF GEOMETRY
-  ======================= */
-  const leftMargin = 48;
-  const rightMargin = W - 20;
-  const lineSpacing = 16;
-  const half = lineSpacing / 2;
+/* =========================
+   KEY SIGNATURE MAPPINGS
+   THIS IS WHAT YOU EDIT
+   ========================= */
 
-  const totalHeight = 4*lineSpacing + 2*lineSpacing + 4*lineSpacing;
-  const topMargin = (H - totalHeight) / 2;
+/*
+Each piano note (a–l) maps to:
+- staffNote: C D E F G A B
+- accidental: "#", "b", "♮", or ""
+*/
 
-  const trebleTop = topMargin;
-  const trebleBottom = trebleTop + 4 * lineSpacing;
-  const bassTop = trebleBottom + 2 * lineSpacing;
-  const bassBottom = bassTop + 4 * lineSpacing;
+const KEY_SIGNATURES = {
 
-  const noteX = W / 2 + 30;
+  C: {
+    a: { staffNote: "C", accidental: ""  },
+    b: { staffNote: "C", accidental: "#" },
+    c: { staffNote: "D", accidental: ""  },
+    d: { staffNote: "D", accidental: "#" },
+    e: { staffNote: "E", accidental: ""  },
+    f: { staffNote: "F", accidental: ""  },
+    g: { staffNote: "F", accidental: "#" },
+    h: { staffNote: "G", accidental: ""  },
+    i: { staffNote: "G", accidental: "#" },
+    j: { staffNote: "A", accidental: ""  },
+    k: { staffNote: "A", accidental: "#" },
+    l: { staffNote: "B", accidental: ""  }
+  },
 
-  /* =======================
-     FIXED STAFF SLOTS
-  ======================= */
-  const STAFF_SLOT = { C:0, D:1, E:2, F:3, G:4, A:5, B:6 };
-  const REF_STEP = 4 * 7 + STAFF_SLOT.E; // E4 reference
-
-  /* =======================
-     PIANO IDS (12 SEMITONES)
-  ======================= */
-  const P = {
-    C:"a", CSH:"b", D:"c", DSH:"d",
-    E:"e", F:"f", FSH:"g",
-    G:"h", GSH:"i",
-    A:"j", ASH:"k", B:"l"
-  };
-
-  /* =======================
-     🔥 FULL KEY MAP 🔥
-     EDIT VALUES ONLY
-  ======================= */
-  const KEY_MAP = {
-
-    C: {
-      a:{s:"C",a:""}, b:{s:"C",a:"#"},
-      c:{s:"D",a:""}, d:{s:"D",a:"#"},
-      e:{s:"E",a:""},
-      f:{s:"F",a:""}, g:{s:"F",a:"#"},
-      h:{s:"G",a:""}, i:{s:"G",a:"#"},
-      j:{s:"A",a:""}, k:{s:"A",a:"#"},
-      l:{s:"B",a:""}
-    },
-
-    G: {
-      a:{s:"C",a:""}, b:{s:"C",a:"#"},
-      c:{s:"D",a:""}, d:{s:"D",a:"#"},
-      e:{s:"E",a:""},
-      f:{s:"F",a:"#"}, g:{s:"F",a:"##"},
-      h:{s:"G",a:""}, i:{s:"G",a:"#"},
-      j:{s:"A",a:""}, k:{s:"A",a:"#"},
-      l:{s:"B",a:""}
-    },
-
-    D: {
-      a:{s:"C",a:"#"}, b:{s:"C",a:"##"},
-      c:{s:"D",a:""}, d:{s:"D",a:"#"},
-      e:{s:"E",a:""},
-      f:{s:"F",a:"#"}, g:{s:"F",a:"##"},
-      h:{s:"G",a:""}, i:{s:"G",a:"#"},
-      j:{s:"A",a:""}, k:{s:"A",a:"#"},
-      l:{s:"B",a:""}
-    },
-
-    A: {
-      a:{s:"C",a:"#"}, b:{s:"C",a:"##"},
-      c:{s:"D",a:""}, d:{s:"D",a:"#"},
-      e:{s:"E",a:""},
-      f:{s:"F",a:"#"}, g:{s:"F",a:"##"},
-      h:{s:"G",a:"#"}, i:{s:"G",a:"##"},
-      j:{s:"A",a:""}, k:{s:"A",a:"#"},
-      l:{s:"B",a:""}
-    },
-
-    E: {
-      a:{s:"C",a:"#"}, b:{s:"C",a:"##"},
-      c:{s:"D",a:"#"}, d:{s:"D",a:"##"},
-      e:{s:"E",a:""},
-      f:{s:"F",a:"#"}, g:{s:"F",a:"##"},
-      h:{s:"G",a:"#"}, i:{s:"G",a:"##"},
-      j:{s:"A",a:""}, k:{s:"A",a:"#"},
-      l:{s:"B",a:""}
-    },
-
-    B: {
-      a:{s:"C",a:"#"}, b:{s:"C",a:"##"},
-      c:{s:"D",a:"#"}, d:{s:"D",a:"##"},
-      e:{s:"E",a:""},
-      f:{s:"F",a:"#"}, g:{s:"F",a:"##"},
-      h:{s:"G",a:"#"}, i:{s:"G",a:"##"},
-      j:{s:"A",a:"#"}, k:{s:"A",a:"##"},
-      l:{s:"B",a:""}
-    },
-
-    "F#": {
-      a:{s:"C",a:"#"}, b:{s:"C",a:"##"},
-      c:{s:"D",a:"#"}, d:{s:"D",a:"##"},
-      e:{s:"E",a:"#"},
-      f:{s:"E",a:"#"},
-      g:{s:"F",a:"#"},
-      h:{s:"G",a:"#"}, i:{s:"G",a:"##"},
-      j:{s:"A",a:"#"}, k:{s:"A",a:"##"},
-      l:{s:"B",a:"#"}
-    },
-
-    "C#": {
-      a:{s:"C",a:"#"}, b:{s:"C",a:"##"},
-      c:{s:"D",a:"#"}, d:{s:"D",a:"##"},
-      e:{s:"E",a:"#"},
-      f:{s:"E",a:"#"},
-      g:{s:"F",a:"#"},
-      h:{s:"G",a:"#"}, i:{s:"G",a:"##"},
-      j:{s:"A",a:"#"}, k:{s:"A",a:"##"},
-      l:{s:"B",a:"#"}
-    },
-
-    F: {
-      a:{s:"C",a:""}, b:{s:"D",a:"b"},
-      c:{s:"D",a:""}, d:{s:"E",a:"b"},
-      e:{s:"E",a:""},
-      f:{s:"F",a:""}, g:{s:"G",a:"b"},
-      h:{s:"G",a:""}, i:{s:"A",a:"b"},
-      j:{s:"A",a:""}, k:{s:"B",a:"b"},
-      l:{s:"B",a:""}
-    },
-
-    Bb: {
-      a:{s:"C",a:""}, b:{s:"D",a:"b"},
-      c:{s:"D",a:""}, d:{s:"E",a:"b"},
-      e:{s:"E",a:"b"},
-      f:{s:"F",a:""}, g:{s:"G",a:"b"},
-      h:{s:"G",a:""}, i:{s:"A",a:"b"},
-      j:{s:"A",a:""}, k:{s:"B",a:"b"},
-      l:{s:"B",a:"b"}
-    },
-
-    Eb: {
-      a:{s:"C",a:""}, b:{s:"D",a:"b"},
-      c:{s:"D",a:""}, d:{s:"E",a:"b"},
-      e:{s:"E",a:"b"},
-      f:{s:"F",a:""}, g:{s:"G",a:"b"},
-      h:{s:"G",a:""}, i:{s:"A",a:"b"},
-      j:{s:"A",a:"b"},
-      k:{s:"B",a:"b"},
-      l:{s:"B",a:"b"}
-    },
-
-    Ab: {
-      a:{s:"C",a:""}, b:{s:"D",a:"b"},
-      c:{s:"D",a:"b"}, d:{s:"E",a:"b"},
-      e:{s:"E",a:"b"},
-      f:{s:"F",a:""}, g:{s:"G",a:"b"},
-      h:{s:"G",a:""}, i:{s:"A",a:"b"},
-      j:{s:"A",a:"b"},
-      k:{s:"B",a:"b"},
-      l:{s:"B",a:"b"}
-    },
-
-    Db: {
-      a:{s:"C",a:"b"},
-      b:{s:"C",a:"b"},
-      c:{s:"D",a:"b"},
-      d:{s:"D",a:"b"},
-      e:{s:"E",a:"b"},
-      f:{s:"F",a:""},
-      g:{s:"G",a:"b"},
-      h:{s:"G",a:"b"},
-      i:{s:"A",a:"b"},
-      j:{s:"A",a:"b"},
-      k:{s:"B",a:"b"},
-      l:{s:"B",a:"b"}
-    },
-
-    Gb: {
-      a:{s:"C",a:"b"},
-      b:{s:"C",a:"b"},
-      c:{s:"D",a:"b"},
-      d:{s:"D",a:"b"},
-      e:{s:"E",a:"b"},
-      f:{s:"F",a:"b"},
-      g:{s:"F",a:"b"},
-      h:{s:"G",a:"b"},
-      i:{s:"A",a:"b"},
-      j:{s:"A",a:"b"},
-      k:{s:"B",a:"b"},
-      l:{s:"B",a:"b"}
-    },
-
-    Cb: {
-      a:{s:"C",a:"b"},
-      b:{s:"C",a:"b"},
-      c:{s:"D",a:"b"},
-      d:{s:"D",a:"b"},
-      e:{s:"E",a:"b"},
-      f:{s:"F",a:"b"},
-      g:{s:"F",a:"b"},
-      h:{s:"G",a:"b"},
-      i:{s:"A",a:"b"},
-      j:{s:"A",a:"b"},
-      k:{s:"B",a:"b"},
-      l:{s:"B",a:"b"}
-    }
-  };
-
-  let currentKey = "C";
-
-  /* =======================
-     DRAW STAFF
-  ======================= */
-  function drawLines(top) {
-    for (let i=0;i<5;i++) {
-      const y = top + i*lineSpacing;
-      const l = document.createElementNS(SVG_NS,"line");
-      l.setAttribute("x1", leftMargin-36);
-      l.setAttribute("x2", rightMargin);
-      l.setAttribute("y1", y);
-      l.setAttribute("y2", y);
-      l.setAttribute("stroke","#000");
-      staticGroup.appendChild(l);
-    }
+  Fsharp: {
+    a: { staffNote: "B", accidental: "#" }, // C#
+    b: { staffNote: "C", accidental: "#" },
+    c: { staffNote: "D", accidental: ""  },
+    d: { staffNote: "D", accidental: "#" },
+    e: { staffNote: "E", accidental: "#" }, // E#
+    f: { staffNote: "E", accidental: "#" }, // F = E#
+    g: { staffNote: "F", accidental: "#" },
+    h: { staffNote: "G", accidental: "#" },
+    i: { staffNote: "A", accidental: ""  },
+    j: { staffNote: "A", accidental: "#" },
+    k: { staffNote: "B", accidental: ""  },
+    l: { staffNote: "C", accidental: "#" }
   }
 
-  function drawStatic() {
-    staticGroup.innerHTML="";
-    drawLines(trebleTop);
-    drawLines(bassTop);
+  // ADD MORE KEYS BY COPYING FULL BLOCKS
+};
+
+/* =========================
+   STATE
+   ========================= */
+
+let currentKey = "C";
+let activeNote = null;
+
+/* =========================
+   CANVAS SETUP
+   ========================= */
+
+const canvas = document.getElementById("staff");
+const ctx = canvas.getContext("2d");
+
+/* =========================
+   DRAW STAFF
+   ========================= */
+
+function drawStaff() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  ctx.strokeStyle = "#000";
+  ctx.lineWidth = 1;
+
+  for (let i = 0; i < STAFF.lineCount; i++) {
+    const y = STAFF.topY + i * STAFF.lineSpacing;
+    ctx.beginPath();
+    ctx.moveTo(STAFF.leftX, y);
+    ctx.lineTo(STAFF.leftX + STAFF.width, y);
+    ctx.stroke();
   }
+}
 
-  /* =======================
-     NOTE RENDER
-  ======================= */
-  function renderNote(id, octave=4) {
-    notesGroup.innerHTML="";
-    const map = KEY_MAP[currentKey][id];
-    if (!map) return;
+/* =========================
+   DRAW NOTE
+   ========================= */
 
-    const step = octave*7 + STAFF_SLOT[map.s] - REF_STEP;
-    const y = trebleBottom - step*half;
+function drawNote(pianoId) {
+  const map = KEY_SIGNATURES[currentKey][pianoId];
+  if (!map) return;
 
-    const head = document.createElementNS(SVG_NS,"ellipse");
-    head.setAttribute("cx",noteX);
-    head.setAttribute("cy",y);
-    head.setAttribute("rx",9);
-    head.setAttribute("ry",6);
-    head.setAttribute("transform",`rotate(-20 ${noteX} ${y})`);
-    head.setAttribute("fill","#000");
-    notesGroup.appendChild(head);
+  const y = STAFF_POSITIONS[map.staffNote];
+  const x = STAFF.leftX + STAFF.width - 60;
 
-    if (map.a) {
-      const t = document.createElementNS(SVG_NS,"text");
-      t.setAttribute("x",noteX-22);
-      t.setAttribute("y",y+4);
-      t.textContent = map.a==="##"?"𝄪":map.a==="#"?"♯":map.a==="b"?"♭":"♮";
-      notesGroup.appendChild(t);
-    }
+  // Notehead
+  ctx.beginPath();
+  ctx.ellipse(x, y, STAFF.noteRadius + 2, STAFF.noteRadius, 0, 0, Math.PI * 2);
+  ctx.fillStyle = "#000";
+  ctx.fill();
+
+  // Accidental
+  if (map.accidental) {
+    ctx.font = "14px serif";
+    ctx.fillText(map.accidental, x - 14, y + 4);
   }
+}
 
-  /* =======================
-     API
-  ======================= */
-  window.staffDrawPiano = (id,oct=4)=>renderNote(id,oct);
-  window.staffSetKey = k=>{currentKey=k; drawStatic(); notesGroup.innerHTML="";};
+/* =========================
+   PUBLIC API
+   ========================= */
 
-  document.getElementById("key-selector").addEventListener("change",e=>{
-    staffSetKey(e.target.value);
-  });
+window.setKeySignature = function (key) {
+  currentKey = key;
+  redraw();
+};
 
-  drawStatic();
-})();
+window.playPianoNote = function (pianoId) {
+  activeNote = pianoId;
+  redraw();
+};
+
+function redraw() {
+  drawStaff();
+  if (activeNote) drawNote(activeNote);
+}
+
+/* =========================
+   INITIAL DRAW
+   ========================= */
+
+drawStaff();
