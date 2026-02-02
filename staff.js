@@ -405,8 +405,8 @@ function drawKeySignature() {
   const symbol = ks.type === "sharp" ? "♯" : "♭";
 
   // ===== MANUAL POSITION KNOBS =====
-  const trebleX = leftMargin + 4;
-  const bassX   = leftMargin + 4;
+  const trebleX = leftMargin + 6;
+  const bassX   = leftMargin + 6;
 
   const trebleBaseY = trebleTop;
   const bassBaseY   = bassTop;
