@@ -437,62 +437,6 @@ function drawKeySignature() {
   }
 }
 
-function drawTrebleClef() {
-  const g = document.createElementNS(SVG_NS, "path");
-  g.setAttribute("d",
-    "M40 10 C10 10 10 60 40 60 C60 60 60 40 40 40 C30 40 30 50 40 50 C55 50 55 20 40 20 C25 20 25 70 40 85 C55 100 70 90 70 75"
-  );
-  g.setAttribute("fill", "none");
-  g.setAttribute("stroke", "#000");
-  g.setAttribute("stroke-width", "2");
-
-  const scale = 0.9;
-  const x = leftMargin - 30;
-  const gLineY = trebleTop + 3 * lineSpacing;
-
-  g.setAttribute(
-    "transform",
-    `translate(${x}, ${gLineY - 40}) scale(${scale})`
-  );
-
-  staticGroup.appendChild(g);
-}
-
-function drawBassClef() {
-  const curve = document.createElementNS(SVG_NS, "path");
-  curve.setAttribute("d",
-    "M60 40 C20 40 20 80 60 80 C90 80 90 50 60 50"
-  );
-  curve.setAttribute("fill", "none");
-  curve.setAttribute("stroke", "#000");
-  curve.setAttribute("stroke-width", "2");
-
-  const dot1 = document.createElementNS(SVG_NS, "circle");
-  const dot2 = document.createElementNS(SVG_NS, "circle");
-
-  dot1.setAttribute("r", 3);
-  dot2.setAttribute("r", 3);
-  dot1.setAttribute("fill", "#000");
-  dot2.setAttribute("fill", "#000");
-
-  const x = leftMargin - 24;
-  const fLineY = bassTop + 2 * lineSpacing;
-
-  curve.setAttribute(
-    "transform",
-    `translate(${x}, ${fLineY - 20}) scale(1)`
-  );
-
-  dot1.setAttribute("cx", x + 32);
-  dot1.setAttribute("cy", fLineY - half);
-  dot2.setAttribute("cx", x + 32);
-  dot2.setAttribute("cy", fLineY + half);
-
-  staticGroup.appendChild(curve);
-  staticGroup.appendChild(dot1);
-  staticGroup.appendChild(dot2);
-}
-
   function drawStatic() {
   staticGroup.innerHTML = "";
   keySigGroup.innerHTML = "";
@@ -500,8 +444,19 @@ function drawBassClef() {
   drawLines(trebleTop);
   drawLines(bassTop);
 
-  drawTrebleClef();
-  drawBassClef();
+    const treble = document.createElementNS(SVG_NS,"text");
+    treble.setAttribute("x", leftMargin-34);
+    treble.setAttribute("y", trebleBottom);
+    treble.setAttribute("font-size", 60);
+    treble.textContent = "𝄞";
+    staticGroup.appendChild(treble);
+
+    const bass = document.createElementNS(SVG_NS,"text");
+    bass.setAttribute("x", leftMargin-34);
+    bass.setAttribute("y", bassBottom-8);
+    bass.setAttribute("font-size", 60);
+    bass.textContent = "𝄢";
+    staticGroup.appendChild(bass);
 
 drawKeySignature();
 
