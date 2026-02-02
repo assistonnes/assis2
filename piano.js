@@ -61,7 +61,7 @@ body { display: flex; flex-direction: column; align-items: stretch; }
     
   // --- Audio & keys ---    
   let audioCtx;    
-  const activeNotes = new Set();    
+  const activeNotes = new Map(); // noteName → noteObj    
   let keyWidth=23.5, keyHeight=110, blackKeyWidth=13.7, blackKeyHeight=66;    
   const whiteKeys = [], blackKeys = [];    
   const keyOrder = [    
@@ -264,10 +264,9 @@ updateThumb();
     try { this.osc1.stop(t + 0.3); this.osc2.stop(t + 0.3); } catch(e) {}
   };
 
-  activeNotes.add(noteObj);
-  setTimeout(() => { noteObj.stop(); activeNotes.delete(noteObj); }, 1000);
+  activeNotes.set(note, noteObj);
 
-  if (window.staffDrawNote) window.staffDrawNote(note);
+if (window.staffNoteOn) window.staffNoteOn(note);
 }
     
   function attachKeyEvents(){    
