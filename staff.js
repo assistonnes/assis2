@@ -374,7 +374,7 @@ const KEY_SIGNATURES = {
 };
 
 // relative to staff top line
-const TREBLE_SHARP_Y = [ 5, 30, 0, 20, 45, 15, 44 ];
+const TREBLE_SHARP_Y = [ 5, 30, 0, 21, 46, 11, 40 ];
 const TREBLE_FLAT_Y  = [ 6, 40, 16, 36, 12, 32, 8 ];
 
 const BASS_SHARP_Y = [ 16, 36, 12, 32, 8, 28, 4 ];
