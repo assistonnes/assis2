@@ -459,6 +459,13 @@ notesGroup.appendChild(stem);
 }
   }
 
+function redrawAllNotes() {
+  notesGroup.innerHTML = "";
+  for (const n of activeNotes.values()) {
+    renderNote(n.pianoId, n.octave);
+  }
+}
+
   /* =======================
      API
   ======================= */
@@ -489,10 +496,22 @@ function noteNameToPianoId(name) {
 }
 
 // RESTORE ORIGINAL API
-window.staffDrawNote = function(noteName) {
+window.staffNoteOn = function(noteName) {
   const r = noteNameToPianoId(noteName);
   if (!r) return;
-  renderNote(r.id, r.octave);
+
+  const key = r.id + r.octave;
+  activeNotes.set(key, { pianoId: r.id, octave: r.octave });
+  redrawAllNotes();
+};
+
+window.staffNoteOff = function(noteName) {
+  const r = noteNameToPianoId(noteName);
+  if (!r) return;
+
+  const key = r.id + r.octave;
+  activeNotes.delete(key);
+  redrawAllNotes();
 };
   window.staffSetKey = k => {
   currentKey = k;
