@@ -80,9 +80,12 @@
   container.appendChild(svg);
 
   const staticGroup = document.createElementNS(SVG_NS, "g");
-  const notesGroup = document.createElementNS(SVG_NS, "g");
-  svg.appendChild(staticGroup);
-  svg.appendChild(notesGroup);
+const keySigGroup = document.createElementNS(SVG_NS, "g");
+const notesGroup = document.createElementNS(SVG_NS, "g");
+
+svg.appendChild(staticGroup);
+svg.appendChild(keySigGroup);
+svg.appendChild(notesGroup);
 
   /* =======================
      LAYOUT (UNCHANGED)
@@ -350,6 +353,33 @@ const activeNotes = new Map();
 
   let currentKey = "C";
 
+const KEY_SIGNATURES = {
+  C:  { type:null, count:0 },
+
+  G:  { type:"sharp", count:1 },
+  D:  { type:"sharp", count:2 },
+  A:  { type:"sharp", count:3 },
+  E:  { type:"sharp", count:4 },
+  B:  { type:"sharp", count:5 },
+  "F#":{ type:"sharp", count:6 },
+  "C#":{ type:"sharp", count:7 },
+
+  F:  { type:"flat", count:1 },
+  Bb: { type:"flat", count:2 },
+  Eb: { type:"flat", count:3 },
+  Ab: { type:"flat", count:4 },
+  Db: { type:"flat", count:5 },
+  Gb: { type:"flat", count:6 },
+  Cb: { type:"flat", count:7 }
+};
+
+// relative to staff top line
+const TREBLE_SHARP_Y = [ 32, 12, 36, 16, 40, 20, 44 ];
+const TREBLE_FLAT_Y  = [ 20, 40, 16, 36, 12, 32, 8 ];
+
+const BASS_SHARP_Y = [ 16, 36, 12, 32, 8, 28, 4 ];
+const BASS_FLAT_Y  = [ 28, 8, 32, 12, 36, 16, 40 ];
+
   /* =======================
      STATIC DRAW
   ======================= */
@@ -366,10 +396,53 @@ const activeNotes = new Map();
     }
   }
 
+function drawKeySignature() {
+  keySigGroup.innerHTML = "";
+
+  const ks = KEY_SIGNATURES[currentKey];
+  if (!ks || !ks.type) return;
+
+  const symbol = ks.type === "sharp" ? "♯" : "♭";
+
+  // ===== MANUAL POSITION KNOBS =====
+  const trebleX = leftMargin - 6;
+  const bassX   = leftMargin - 6;
+
+  const trebleBaseY = trebleTop;
+  const bassBaseY   = bassTop;
+
+  const spacing = 14; // horizontal spacing between accidentals
+  // =================================
+
+  const trebleY = ks.type === "sharp" ? TREBLE_SHARP_Y : TREBLE_FLAT_Y;
+  const bassY   = ks.type === "sharp" ? BASS_SHARP_Y   : BASS_FLAT_Y;
+
+  for (let i = 0; i < ks.count; i++) {
+
+    // ---- TREBLE ----
+    const t = document.createElementNS(SVG_NS,"text");
+    t.setAttribute("x", trebleX + i * spacing);
+    t.setAttribute("y", trebleBaseY + trebleY[i]);
+    t.setAttribute("font-size", 18);
+    t.textContent = symbol;
+    keySigGroup.appendChild(t);
+
+    // ---- BASS ----
+    const b = document.createElementNS(SVG_NS,"text");
+    b.setAttribute("x", bassX + i * spacing);
+    b.setAttribute("y", bassBaseY + bassY[i]);
+    b.setAttribute("font-size", 18);
+    b.textContent = symbol;
+    keySigGroup.appendChild(b);
+  }
+}
+
   function drawStatic() {
-    staticGroup.innerHTML = "";
-    drawLines(trebleTop);
-    drawLines(bassTop);
+  staticGroup.innerHTML = "";
+  keySigGroup.innerHTML = "";
+
+  drawLines(trebleTop);
+  drawLines(bassTop);
 
     const treble = document.createElementNS(SVG_NS,"text");
     treble.setAttribute("x", leftMargin-34);
@@ -384,6 +457,9 @@ const activeNotes = new Map();
     bass.setAttribute("font-size", 60);
     bass.textContent = "𝄢";
     staticGroup.appendChild(bass);
+
+drawKeySignature();
+
   }
 
   /* =======================
