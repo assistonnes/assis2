@@ -268,13 +268,52 @@ updateThumb();
 
 if (window.staffNoteOn) window.staffNoteOn(note);
 }
+
+function stopNote(note) {
+  const noteObj = activeNotes.get(note);
+  if (!noteObj) return;
+
+  noteObj.stop();
+  activeNotes.delete(note);
+
+  if (window.staffNoteOff) window.staffNoteOff(note);
+}
     
-  function attachKeyEvents(){    
-    [...whiteKeys, ...blackKeys].forEach(k=>{    
-      k.onclick=()=>playNote(k.dataset.note);    
-      k.ontouchstart=e=>{ e.preventDefault(); playNote(k.dataset.note); };    
-    });    
-  }    
+  function attachKeyEvents() {
+  [...whiteKeys, ...blackKeys].forEach(k => {
+    const note = k.dataset.note;
+
+    // Mouse
+    k.addEventListener("mousedown", e => {
+      e.preventDefault();
+      playNote(note);
+    });
+
+    k.addEventListener("mouseup", e => {
+      e.preventDefault();
+      stopNote(note);
+    });
+
+    k.addEventListener("mouseleave", () => {
+      stopNote(note);
+    });
+
+    // Touch
+    k.addEventListener("touchstart", e => {
+      e.preventDefault();
+      playNote(note);
+    }, { passive: false });
+
+    k.addEventListener("touchend", e => {
+      e.preventDefault();
+      stopNote(note);
+    });
+
+    k.addEventListener("touchcancel", () => {
+      stopNote(note);
+    });
+  });
+}
     
   // --- Zoom ---    
   function zoomKeys(factor){    
