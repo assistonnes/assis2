@@ -5,72 +5,44 @@
      CSS (UNCHANGED GEOMETRY)
   ======================= */
   const css = `
-@font-face {
-  font-family: "MusicFont";
-  src: url("fonts/NotoMusic-Regular.ttf") format("truetype");
-  font-weight: normal;
-  font-style: normal;
-}
-
-/* =======================
-   UI FONT (non-music)
-======================= */
-#controls-wrapper,
-#key-select-wrapper {
-  font-family: system-ui, sans-serif;
-}
-
-/* =======================
-   MUSIC FONT — FOR SVG
-======================= */
-#image-placeholder svg text {
-  font-family: "MusicFont";
-  font-weight: normal;
-}
-
-/* =======================
-   EXISTING STYLES
-======================= */
-#controls-wrapper {
-  position: relative;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 10px;
-}
-
-#key-select-wrapper {
-  position: absolute;
-  right: 50%;
-  transform: translate(-160%, -50%);
-  top: 50%;
-  min-width: 60px;
-  text-align: right;
-  z-index: 10;
-  font-size: 14px;
-}
-
-#image-placeholder {
-  transform: translate(-8%, 0%);
-  width: 150px;
-  height: 130px;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  margin: 0 auto;
-  position: relative;
-}
-
-#image-placeholder svg {
-  width: 100%;
-  height: 100%;
-}
-`;
+  #controls-wrapper {
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+  }
+  #key-select-wrapper {
+    position: absolute;
+    right: 50%;
+    transform: translate(-160%, -50%);
+    top: 50%;
+    min-width: 60px;
+    text-align: right;
+    z-index: 10;
+    font-family: system-ui, sans-serif;
+    font-size: 14px;
+  }
+  #image-placeholder {
+    transform: translate(-8%, 0%);
+    width: 150px;
+    height: 130px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin: 0 auto;
+    position: relative;
+  }
+  #image-placeholder svg {
+    width: 100%;
+    height: 100%;
+  }
+  `;
   const style = document.createElement("style");
   style.textContent = css;
   document.head.appendChild(style);
