@@ -405,13 +405,13 @@ function drawKeySignature() {
   const symbol = ks.type === "sharp" ? "♯" : "♭";
 
   // ===== MANUAL POSITION KNOBS =====
-  const trebleX = leftMargin - 6;
-  const bassX   = leftMargin - 6;
+  const trebleX = leftMargin - 3;
+  const bassX   = leftMargin - 3;
 
   const trebleBaseY = trebleTop;
   const bassBaseY   = bassTop;
 
-  const spacing = 14; // horizontal spacing between accidentals
+  const spacing = 10; // horizontal spacing between accidentals
   // =================================
 
   const trebleY = ks.type === "sharp" ? TREBLE_SHARP_Y : TREBLE_FLAT_Y;
