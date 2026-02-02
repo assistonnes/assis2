@@ -345,6 +345,9 @@ const KEY_MAP = {
 
 };
 
+const activeNotes = new Map(); 
+// key = pianoId + octave, value = { pianoId, octave }
+
   let currentKey = "C";
 
   /* =======================
@@ -397,7 +400,6 @@ const KEY_MAP = {
   }
 
   function renderNote(pianoId, octave=4) {
-    notesGroup.innerHTML = "";
 
     const keyTable = KEY_MAP[currentKey];
     if (!keyTable || !keyTable[pianoId]) return;
