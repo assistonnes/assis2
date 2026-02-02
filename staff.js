@@ -25,19 +25,19 @@
     font-size: 14px;
   }
   #image-placeholder {
-    transform: translate(-8%, 0%);
-    width: 150px;
-    height: 130px;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    margin: 0 auto;
-    position: relative;
-  }
+  transform: translate(-8%, 0%);
+  width: min(90vw, 400px);    /* max 400px on large screens, 90% of viewport on small */
+  aspect-ratio: 230 / 230;    /* same as your SVG viewBox */
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin: 0 auto;
+  position: relative;
+}
   #image-placeholder svg {
     width: 100%;
     height: 100%;
