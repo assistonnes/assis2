@@ -458,7 +458,7 @@ function drawKeySignature() {
     const treble = document.createElementNS(SVG_NS,"text");    
     treble.setAttribute("x", leftMargin-34);    
     treble.setAttribute("y", trebleBottom);    
-    treble.setAttribute("font-size", 20);    
+    treble.setAttribute("font-size", 60);    
     treble.textContent = "𝄞";    
 treble.setAttribute("class", "music-font");
     staticGroup.appendChild(treble);    
@@ -466,7 +466,7 @@ treble.setAttribute("class", "music-font");
     const bass = document.createElementNS(SVG_NS,"text");    
     bass.setAttribute("x", leftMargin-34);    
     bass.setAttribute("y", bassBottom-8);    
-    bass.setAttribute("font-size", 20);    
+    bass.setAttribute("font-size", 60);    
     bass.textContent = "𝄢";    
 bass.setAttribute("class", "music-font");
     staticGroup.appendChild(bass);    
