@@ -227,8 +227,8 @@ const KEY_MAP = {
     b:{slot:"C",acc:""},    
     c:{slot:"D",acc:"b"},    
     d:{slot:"D",acc:""},    
-    e:{slot:"E",acc:"b"},      
-    f:{slot:"E",acc:"n"},   // F → E#    
+    e:{slot:"E",acc:"n"},      
+    f:{slot:"E",acc:""},   // F → E#    
     g:{slot:"F",acc:""},    
     h:{slot:"G",acc:"b"},    
     i:{slot:"G",acc:""},    
@@ -539,9 +539,9 @@ notesGroup.appendChild(stem);
     
     if (acc !== "") {    
   const t = document.createElementNS(SVG_NS,"text");    
-  t.setAttribute("x",noteX-22);    
+  t.setAttribute("x",noteX-25);    
   t.setAttribute("y",y+4);    
-  t.setAttribute("font-size",12);    
+  t.setAttribute("font-size",15);    
   t.textContent =
   acc === "##" ? "𝄪" :
   acc === "#"  ? "♯" :
