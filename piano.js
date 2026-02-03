@@ -32,6 +32,12 @@ body { display: flex; flex-direction: column; align-items: stretch; }
   cursor: pointer;
 }
 
+.scroll-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 #scroll-left-key, #scroll-right-key,
 #scroll-left-octave, #scroll-right-octave {
   width: 30px;
