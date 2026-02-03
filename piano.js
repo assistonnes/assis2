@@ -315,16 +315,42 @@ function stopNote(note) {
   });
 }
     
-  // --- Zoom ---    
-  function zoomKeys(factor){    
-    keyWidth=Math.min(Math.max(keyWidth*factor,8),60);    
-    blackKeyWidth=keyWidth*0.65; blackKeyHeight=keyHeight*0.6;    
-    updateKeyLayout();    
-    updateThumb();    
-    if (window.updateUnitScale) {    
-    window.updateUnitScale();    
-}    
-  }    
+  // helper: get visual center of piano content
+
+function getCenterRatio() {
+  const centerX = pianoWrapper.scrollLeft + pianoWrapper.clientWidth / 2;
+  return centerX / pianoWrapper.scrollWidth;
+}
+
+function restoreCenterFromRatio(ratio) {
+  const newCenterX = ratio * pianoWrapper.scrollWidth;
+  const newScroll = newCenterX - pianoWrapper.clientWidth / 2;
+
+  const maxScroll =
+    pianoWrapper.scrollWidth - pianoWrapper.clientWidth;
+
+  pianoWrapper.scrollLeft = Math.min(
+    Math.max(newScroll, 0),
+    maxScroll
+  );
+}
+
+// --- Zoom ---
+function zoomKeys(factor) {
+  const centerRatio = getCenterRatio();
+
+  keyWidth = Math.min(Math.max(keyWidth * factor, 8), 60);
+  blackKeyWidth = keyWidth * 0.65;
+  blackKeyHeight = keyHeight * 0.6;
+
+  updateKeyLayout();
+  restoreCenterFromRatio(centerRatio);
+  updateThumb();
+
+  if (window.updateUnitScale) {
+    window.updateUnitScale();
+  }
+} 
     
   document.getElementById('zoom-in').onclick=()=>zoomKeys(1.2);    
   document.getElementById('zoom-out').onclick=()=>zoomKeys(1/1.2);    
