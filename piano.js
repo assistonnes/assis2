@@ -8,12 +8,21 @@
 html, body { margin: 0; padding: 0; overflow-x: hidden; box-sizing: border-box; font-family: Arial, sans-serif; background: #f4f4f4; }    
 body { display: flex; flex-direction: column; align-items: stretch; }    
 /* Scrollbar + buttons layout */    
-#scrollbar-container { display: flex; align-items: center; justify-content: center; gap: 3px; margin: 3px auto; width: 100%; max-width: 100%; padding: 0 8px; box-sizing: border-box; }    
+#scrollbar-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* ← KEY CHANGE */
+  gap: 6px;
+  margin: 6px auto;
+  width: 100%;
+  padding: 0 8px;
+  box-sizing: border-box;
+}
 #piano-scrollbar {
   height: 28px;              /* taller = easier thumb grab */
   background: #ccc;
   border-radius: 8px;
-  flex: 0.6;                 /* <-- KEY CHANGE: less width */
+  flex: 1;                 /* <-- KEY CHANGE: less width */
   position: relative;
   cursor: pointer;
 }
