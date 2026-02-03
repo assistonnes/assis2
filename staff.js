@@ -14,7 +14,7 @@
 }
 
 .music-font {
-  font-family: "NotoMusic";
+  font-family: "NotoMusic";}
 
   #controls-wrapper {    
     position: relative;    
