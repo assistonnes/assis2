@@ -375,22 +375,44 @@ function restoreCenterFromRatio(ratio) {
   );
 }
 
+function getTotalPianoWidthForKeyWidth(testKeyWidth) {
+  const spacing = 1;
+  return whiteKeys.length * testKeyWidth
+       + (whiteKeys.length - 1) * spacing;
+}
+
+function getExactFitKeyWidth() {
+  const spacing = 1;
+  const available = pianoWrapper.clientWidth
+                  - (whiteKeys.length - 1) * spacing;
+  return available / whiteKeys.length;
+}
+
 // --- Zoom ---
 function zoomKeys(factor) {
   const centerRatio = getCenterRatio();
 
-  const minFitWidth = getMinKeyWidthToFit();
-  const MIN_KEY_WIDTH = Math.max(8, minFitWidth);
   const MAX_KEY_WIDTH = 110;
+  const ABSOLUTE_MIN = 8;
 
   let newKeyWidth = keyWidth * factor;
 
-  // stop zoom-out when piano fully fits
-  if (factor < 1 && newKeyWidth <= MIN_KEY_WIDTH) {
-    newKeyWidth = MIN_KEY_WIDTH;
+  const fitKeyWidth = getExactFitKeyWidth();
+  const minAllowed = Math.max(ABSOLUTE_MIN, fitKeyWidth);
+
+  // If zooming out, clamp ONLY when piano would fit
+  if (factor < 1) {
+    const testWidth = getTotalPianoWidthForKeyWidth(newKeyWidth);
+
+    if (testWidth <= pianoWrapper.clientWidth) {
+      newKeyWidth = fitKeyWidth;
+    }
   }
 
-  keyWidth = Math.min(Math.max(newKeyWidth, MIN_KEY_WIDTH), MAX_KEY_WIDTH);
+  keyWidth = Math.min(
+    Math.max(newKeyWidth, minAllowed),
+    MAX_KEY_WIDTH
+  );
 
   blackKeyWidth = keyWidth * 0.65;
   blackKeyHeight = keyHeight * 0.6;
