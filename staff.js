@@ -436,6 +436,7 @@ function drawKeySignature() {
     t.setAttribute("y", trebleBaseY + trebleY[i]);    
     t.setAttribute("font-size", 18);    
     t.textContent = symbol;    
+t.setAttribute("class", "music-font");
     keySigGroup.appendChild(t);    
     
     // ---- BASS ----    
@@ -444,6 +445,7 @@ function drawKeySignature() {
     b.setAttribute("y", bassBaseY + bassY[i]);    
     b.setAttribute("font-size", 18);    
     b.textContent = symbol;    
+b.setAttribute("class", "music-font");
     keySigGroup.appendChild(b);    
   }    
 }    
@@ -544,6 +546,7 @@ notesGroup.appendChild(stem);
     acc === "##" ? "𝄪" :    
     acc === "#"  ? "♯" :    
     acc === "b"  ? "♭" : "♮";    
+t.setAttribute("class", "music-font");
   notesGroup.appendChild(t);    
 }    
   }    
