@@ -377,20 +377,26 @@ function restoreCenterFromRatio(ratio) {
 
 // --- Zoom ---
 function zoomKeys(factor) {
-  // 1. capture center anchor
   const centerRatio = getCenterRatio();
 
-  // 2. apply zoom
-  keyWidth = Math.min(Math.max(keyWidth * factor, 8), 60);
+  const minFitWidth = getMinKeyWidthToFit();
+  const MIN_KEY_WIDTH = Math.max(8, minFitWidth);
+  const MAX_KEY_WIDTH = 110;
+
+  let newKeyWidth = keyWidth * factor;
+
+  // stop zoom-out when piano fully fits
+  if (factor < 1 && newKeyWidth <= MIN_KEY_WIDTH) {
+    newKeyWidth = MIN_KEY_WIDTH;
+  }
+
+  keyWidth = Math.min(Math.max(newKeyWidth, MIN_KEY_WIDTH), MAX_KEY_WIDTH);
+
   blackKeyWidth = keyWidth * 0.65;
   blackKeyHeight = keyHeight * 0.6;
 
   updateKeyLayout();
-
-  // 3. restore center
   restoreCenterFromRatio(centerRatio);
-
-  // 4. update UI
   updateThumb();
 
   if (window.updateUnitScale) {
@@ -411,6 +417,14 @@ function zoomKeys(factor) {
     const clampedScroll=Math.min(Math.max(pianoWrapper.scrollLeft,0),Math.max(maxScroll,0));    
     scrollThumb.style.left=(clampedScroll/Math.max(maxScroll,1))*(trackWidth-scrollThumb.clientWidth)+'px';    
   }    
+
+function getMinKeyWidthToFit() {
+  const whiteKeyCount = whiteKeys.length;
+  const spacing = 1; // same whiteKeySpacing you use
+  const totalSpacing = spacing * (whiteKeyCount - 1);
+
+  return (pianoWrapper.clientWidth - totalSpacing) / whiteKeyCount;
+}
     
   pianoWrapper.addEventListener('scroll', updateThumb);    
   window.addEventListener('resize', updateThumb);    
