@@ -25,9 +25,20 @@ body { display: flex; flex-direction: column; align-items: stretch; }
   left: 0;
   min-width: 40px;
 }
-#zoom-out, #zoom-in { width: 20px; height: 20px; padding: 0px 2px; font-size: 16px; cursor: pointer; }    
-.scroll-group { display: flex; align-items: center; gap: 4px; }    
-#scroll-left-key, #scroll-right-key, #scroll-left-octave, #scroll-right-octave { width: 20px; height: 20px; padding: 0px 2px; font-size: 14px; cursor: pointer; }    
+#zoom-out, #zoom-in {
+  width: 30px;
+  height: 30px;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+#scroll-left-key, #scroll-right-key,
+#scroll-left-octave, #scroll-right-octave {
+  width: 30px;
+  height: 30px;
+  font-size: 16px;
+  cursor: pointer;
+}
 /* Piano wrapper and keys */    
 #piano-wrapper { height: 200px; overflow-x: auto; overflow-y: visible; -webkit-overflow-scrolling: touch; position: relative; margin: 0; padding: 0; display: flex; align-items: flex-start; }    
 #piano-wrapper::-webkit-scrollbar { display: none; }    
