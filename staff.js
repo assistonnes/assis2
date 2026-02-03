@@ -5,6 +5,17 @@
      CSS (UNCHANGED GEOMETRY)    
   ======================= */    
   const css = `    
+
+@font-face {
+  font-family: "NotoMusic";
+  src: url("./NotoMusic-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+.music-font {
+  font-family: "NotoMusic";
+
   #controls-wrapper {    
     position: relative;    
     width: 100%;    
@@ -449,6 +460,7 @@ function drawKeySignature() {
     treble.setAttribute("y", trebleBottom);    
     treble.setAttribute("font-size", 60);    
     treble.textContent = "𝄞";    
+treble.setAttribute("class", "music-font");
     staticGroup.appendChild(treble);    
     
     const bass = document.createElementNS(SVG_NS,"text");    
@@ -456,6 +468,7 @@ function drawKeySignature() {
     bass.setAttribute("y", bassBottom-8);    
     bass.setAttribute("font-size", 60);    
     bass.textContent = "𝄢";    
+bass.setAttribute("class", "music-font");
     staticGroup.appendChild(bass);    
     
 drawKeySignature();    
