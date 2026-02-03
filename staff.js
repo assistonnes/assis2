@@ -539,8 +539,8 @@ notesGroup.appendChild(stem);
     
     if (acc !== "") {    
   const t = document.createElementNS(SVG_NS,"text");    
-  t.setAttribute("x",noteX-25);    
-  t.setAttribute("y",y+4);    
+  t.setAttribute("x",noteX-15);    
+  t.setAttribute("y",y+5);    
   t.setAttribute("font-size",15);    
   t.textContent =
   acc === "##" ? "𝄪" :
