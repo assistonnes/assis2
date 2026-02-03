@@ -364,7 +364,7 @@ function stopNote(note) {
     
   // --- Focus middle C ---    
   function focusMiddleC() {
-  const middleC = whiteKeys.find(k => k.dataset.note === 'C4');
+  const middleC = whiteKeys.find(k => k.dataset.note === 'G4');
   if (!middleC) return;
 
   const maxScroll = pianoWrapper.scrollWidth - pianoWrapper.clientWidth;
