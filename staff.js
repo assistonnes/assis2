@@ -416,8 +416,8 @@ function drawKeySignature() {
   const symbol = ks.type === "sharp" ? "♯" : "♭";    
     
   // ===== MANUAL POSITION KNOBS =====    
-  const trebleX = leftMargin + 6;    
-  const bassX   = leftMargin + 6;    
+  const trebleX = leftMargin + 8;    
+  const bassX   = leftMargin + 8;    
     
   const trebleBaseY = trebleTop;    
   const bassBaseY   = bassTop;    
@@ -539,8 +539,8 @@ notesGroup.appendChild(stem);
     
     if (acc !== "") {    
   const t = document.createElementNS(SVG_NS,"text");    
-  t.setAttribute("x",noteX-15);    
-  t.setAttribute("y",y+5);    
+  t.setAttribute("x",noteX-16);    
+  t.setAttribute("y",y+2);    
   t.setAttribute("font-size",15);    
   t.textContent =
   acc === "##" ? "𝄪" :
