@@ -228,7 +228,7 @@ const KEY_MAP = {
     c:{slot:"D",acc:"b"},    
     d:{slot:"D",acc:""},    
     e:{slot:"E",acc:"b"},      
-    f:{slot:"E",acc:""},   // F → E#    
+    f:{slot:"E",acc:"n"},   // F → E#    
     g:{slot:"F",acc:""},    
     h:{slot:"G",acc:"b"},    
     i:{slot:"G",acc:""},    
@@ -542,10 +542,11 @@ notesGroup.appendChild(stem);
   t.setAttribute("x",noteX-22);    
   t.setAttribute("y",y+4);    
   t.setAttribute("font-size",12);    
-  t.textContent =    
-    acc === "##" ? "𝄪" :    
-    acc === "#"  ? "♯" :    
-    acc === "b"  ? "♭" : "♮";    
+  t.textContent =
+  acc === "##" ? "𝄪" :
+  acc === "#"  ? "♯" :
+  acc === "b"  ? "♭" :
+  acc === "n"  ? "♮" : "";  
 t.setAttribute("class", "music-font");
   notesGroup.appendChild(t);    
 }    
