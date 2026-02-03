@@ -9,8 +9,22 @@ html, body { margin: 0; padding: 0; overflow-x: hidden; box-sizing: border-box; 
 body { display: flex; flex-direction: column; align-items: stretch; }    
 /* Scrollbar + buttons layout */    
 #scrollbar-container { display: flex; align-items: center; justify-content: center; gap: 3px; margin: 3px auto; width: 100%; max-width: 100%; padding: 0 8px; box-sizing: border-box; }    
-#piano-scrollbar { height: 20px; background: #ccc; border-radius: 6px; flex: 1; position: relative; cursor: pointer; }    
-#piano-scroll-thumb { height: 100%; background: #888; border-radius: 6px; position: absolute; left: 0; width: 50px; }    
+#piano-scrollbar {
+  height: 28px;              /* taller = easier thumb grab */
+  background: #ccc;
+  border-radius: 8px;
+  flex: 0.6;                 /* <-- KEY CHANGE: less width */
+  position: relative;
+  cursor: pointer;
+}
+#piano-scroll-thumb {
+  height: 100%;
+  background: #888;
+  border-radius: 8px;
+  position: absolute;
+  left: 0;
+  min-width: 40px;
+}
 #zoom-out, #zoom-in { width: 20px; height: 20px; padding: 0px 2px; font-size: 16px; cursor: pointer; }    
 .scroll-group { display: flex; align-items: center; gap: 4px; }    
 #scroll-left-key, #scroll-right-key, #scroll-left-octave, #scroll-right-octave { width: 20px; height: 20px; padding: 0px 2px; font-size: 14px; cursor: pointer; }    
