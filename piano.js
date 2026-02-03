@@ -377,20 +377,43 @@ function restoreCenterFromRatio(ratio) {
 
 // --- Zoom ---
 function zoomKeys(factor) {
-  const centerRatio = getCenterRatio();
+  const oldKeyWidth = keyWidth;
 
-  keyWidth = Math.min(Math.max(keyWidth * factor, 8), 110);
+  // apply zoom
+  let newKeyWidth = keyWidth * factor;
+
+  // hard min / max (physical limits)
+  newKeyWidth = Math.min(Math.max(newKeyWidth, 8), 110);
+
+  keyWidth = newKeyWidth;
   blackKeyWidth = keyWidth * 0.65;
   blackKeyHeight = keyHeight * 0.6;
 
   updateKeyLayout();
-  restoreCenterFromRatio(centerRatio);
+
+  // 🔒 GUARD: stop zoom-out if everything already fits
+  if (factor < 1) {
+    if (pianoContainer.scrollWidth <= pianoWrapper.clientWidth + 1) {
+      // revert zoom
+      keyWidth = oldKeyWidth;
+      blackKeyWidth = keyWidth * 0.65;
+      blackKeyHeight = keyHeight * 0.6;
+      updateKeyLayout();
+      return;
+    }
+  }
+
   updateThumb();
 
   if (window.updateUnitScale) {
     window.updateUnitScale();
   }
-} 
+}
+
+window.addEventListener("resize", () => {
+  updateKeyLayout();
+  updateThumb();
+});
     
   document.getElementById('zoom-in').onclick=()=>zoomKeys(1.2);    
   document.getElementById('zoom-out').onclick=()=>zoomKeys(1/1.2);    
