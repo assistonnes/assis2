@@ -339,7 +339,7 @@ function restoreCenterFromRatio(ratio) {
 function zoomKeys(factor) {
   const centerRatio = getCenterRatio();
 
-  keyWidth = Math.min(Math.max(keyWidth * factor, 8), 60);
+  keyWidth = Math.min(Math.max(keyWidth * factor, 8), 110);
   blackKeyWidth = keyWidth * 0.65;
   blackKeyHeight = keyHeight * 0.6;
 
