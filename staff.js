@@ -466,7 +466,7 @@ treble.setAttribute("class", "music-font");
     
     const bass = document.createElementNS(SVG_NS,"text");    
     bass.setAttribute("x", leftMargin-34);    
-    bass.setAttribute("y", bassBottom-20);    
+    bass.setAttribute("y", bassBottom-30);    
     bass.setAttribute("font-size", 60);    
     bass.textContent   = "\u{1D122}"; //𝄢     
 bass.setAttribute("class", "music-font");
