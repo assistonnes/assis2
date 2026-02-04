@@ -128,7 +128,7 @@ body { display: flex; flex-direction: column; align-items: stretch; }
     inset -2px 0 3px rgba(0,0,0,0.5),        /* right shadow */
     0 4px 6px rgba(0,0,0,0.1);               /* bottom drop shadow */
 
-  z-index: 1;
+  z-index: 0.5;
   color: #fff;
   transition: background 0.1s, box-shadow 0.1s, transform 0.1s;
 
@@ -160,7 +160,7 @@ body { display: flex; flex-direction: column; align-items: stretch; }
   box-shadow:
     inset 2px 0 3px rgba(255,255,255,0.05),
     inset -2px 0 3px rgba(0,0,0,0.2),
-    0 2px 4px rgba(0,0,0,0.05);
+    0 2px 4px rgba(0,0,0,0.1);
   transform: translateY(1.5px);
 }
   `;    
