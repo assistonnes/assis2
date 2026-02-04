@@ -173,7 +173,14 @@ function generateKeysOnce() {
 }    
     
 // global-ish holder for mapping created at generation time    
-let __whiteNoteToIndex = generateKeysOnce();    
+let __whiteNoteToIndex = generateKeysOnce();  
+
+const initialVisibleKeys = 12; // change this to whatever you like
+const spacing = 1;              // whiteKeySpacing
+
+keyWidth = (pianoWrapper.clientWidth - (initialVisibleKeys - 1) * spacing) / initialVisibleKeys;
+blackKeyWidth = keyWidth * 0.65;
+blackKeyHeight = keyHeight * 0.6;  
     
 // Improved updateKeyLayout    
 function updateKeyLayout() {    
