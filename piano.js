@@ -58,12 +58,105 @@ body { display: flex; flex-direction: column; align-items: stretch; }
 #piano-wrapper { height: 200px; overflow-x: auto; overflow-y: visible; -webkit-overflow-scrolling: touch; position: relative; margin: 0; padding: 0; display: flex; align-items: flex-start; }    
 #piano-wrapper::-webkit-scrollbar { display: none; }    
 #piano-container { position: relative; height: 100%; }    
-.white-key { background: white; border: 1px solid black; border-radius: 3px; text-align: center; line-height: normal; cursor: pointer; user-select: none; position: absolute; display: flex; align-items: flex-end; justify-content: center; font-size: 10px; padding-bottom: 4px; }    
-.black-key { background: black; border-radius: 2px; color: white; text-align: center; line-height: normal; cursor: pointer; user-select: none; position: absolute; display: flex; align-items: flex-end; justify-content: center; font-size: 8px; padding-bottom: 2px; z-index: 1; }    
-.white-key .key-label, .black-key .key-label { pointer-events: none; line-height: 1; user-select: none; position: absolute; bottom: 4px; width: 100%; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }    
-.white-key .key-label { color: black; font-size: 10px; }    
-.black-key .key-label { color: white; font-size: 5px; }    
-#piano-unit { width: 100vw; height: 100vh; position: relative; }    
+/* ---------- White Keys ---------- */
+.white-key {
+  position: absolute;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  border-radius: 4px;
+  border: 1px solid #999;
+
+  /* 3D Gradient Base */
+  background: 
+    linear-gradient(to bottom, #ffffff 0%, #e0e0e0 100%),   /* main shading */
+    radial-gradient(circle at top center, rgba(255,255,255,0.6) 0%, transparent 40%); /* top highlight */
+
+  /* Depth */
+  box-shadow: 
+    inset 0 -3px 5px rgba(0,0,0,0.1), /* subtle inner shadow for bevel */
+    0 2px 4px rgba(0,0,0,0.2);        /* slight lift shadow */
+  
+  transition: background 0.1s, box-shadow 0.1s, transform 0.1s;
+}
+
+/* Key label */
+.white-key .key-label {
+  pointer-events: none;
+  line-height: 1;
+  user-select: none;
+  position: absolute;
+  bottom: 4px;
+  width: 100%;
+  text-align: center;
+  font-size: 10px;
+  color: #000;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Press animation */
+.white-key.pressed {
+  background: 
+    linear-gradient(to bottom, #dcdcdc 0%, #bfbfbf 100%),
+    radial-gradient(circle at top center, rgba(255,255,255,0.3) 0%, transparent 40%);
+  box-shadow: inset 0 0 4px rgba(0,0,0,0.3);
+  transform: translateY(2px);
+}
+
+/* ---------- Black Keys ---------- */
+.black-key {
+  position: absolute;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  border-radius: 3px;
+
+  /* 3D Gradient Base */
+  background: 
+    linear-gradient(to bottom, #444 0%, #111 100%), /* base dark shading */
+    radial-gradient(circle at top center, rgba(255,255,255,0.15) 0%, transparent 40%); /* subtle shine */
+
+  color: #fff;
+  z-index: 1;
+
+  /* Depth */
+  box-shadow: 
+    inset 0 -2px 4px rgba(255,255,255,0.1), /* subtle inner shine */
+    0 3px 5px rgba(0,0,0,0.5);
+  
+  transition: background 0.1s, box-shadow 0.1s, transform 0.1s;
+}
+
+/* Black key label */
+.black-key .key-label {
+  pointer-events: none;
+  line-height: 1;
+  user-select: none;
+  position: absolute;
+  bottom: 2px;
+  width: 100%;
+  text-align: center;
+  font-size: 5px;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Press animation */
+.black-key.pressed {
+  background: 
+    linear-gradient(to bottom, #222 0%, #000 100%),
+    radial-gradient(circle at top center, rgba(255,255,255,0.05) 0%, transparent 40%);
+  box-shadow: inset 0 0 4px rgba(0,0,0,0.5);
+  transform: translateY(1.5px);
+}
   `;    
   const styleEl = document.createElement('style');    
   styleEl.textContent = css;    
@@ -338,29 +431,34 @@ function stopNote(note) {
 
     // Mouse
     k.addEventListener("mousedown", e => {
-      e.preventDefault();
-      playNote(note);
-    });
+  e.preventDefault();
+  k.classList.add("pressed");
+  playNote(note);
+});
 
-    k.addEventListener("mouseup", e => {
-      e.preventDefault();
-      stopNote(note);
-    });
+k.addEventListener("mouseup", e => {
+  e.preventDefault();
+  k.classList.remove("pressed");
+  stopNote(note);
+});
 
-    k.addEventListener("mouseleave", () => {
-      stopNote(note);
-    });
+k.addEventListener("mouseleave", () => {
+  k.classList.remove("pressed");
+  stopNote(note);
+});
 
-    // Touch
-    k.addEventListener("touchstart", e => {
-      e.preventDefault();
-      playNote(note);
-    }, { passive: false });
+// Touch events
+k.addEventListener("touchstart", e => {
+  e.preventDefault();
+  k.classList.add("pressed");
+  playNote(note);
+}, { passive: false });
 
-    k.addEventListener("touchend", e => {
-      e.preventDefault();
-      stopNote(note);
-    });
+k.addEventListener("touchend", e => {
+  e.preventDefault();
+  k.classList.remove("pressed");
+  stopNote(note);
+});
 
     k.addEventListener("touchcancel", () => {
       stopNote(note);
