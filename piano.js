@@ -126,7 +126,7 @@ body { display: flex; flex-direction: column; align-items: stretch; }
   box-shadow:
     inset 2px 0 3px rgba(255,255,255,0.08),   /* left bevel */
     inset -2px 0 3px rgba(0,0,0,0.5),        /* right shadow */
-    0 4px 6px rgba(0,0,0,0);               /* bottom drop shadow */
+    0 4px 6px rgba(0,0,0,0.1);               /* bottom drop shadow */
 
   z-index: 1;
   color: #fff;
@@ -159,8 +159,8 @@ body { display: flex; flex-direction: column; align-items: stretch; }
     radial-gradient(circle at top center, rgba(255,255,255,0.05) 0%, transparent 40%);
   box-shadow:
     inset 2px 0 3px rgba(255,255,255,0.05),
-    inset -2px 0 3px rgba(0,0,0,0.7),
-    0 2px 4px rgba(0,0,0,0.7);
+    inset -2px 0 3px rgba(0,0,0,0.2),
+    0 2px 4px rgba(0,0,0,0.05);
   transform: translateY(1.5px);
 }
   `;    
