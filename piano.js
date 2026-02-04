@@ -128,7 +128,7 @@ body { display: flex; flex-direction: column; align-items: stretch; }
     inset -2px 0 3px rgba(0,0,0,0.5),        /* right shadow */
     0 4px 6px rgba(0,0,0,0.5);               /* bottom drop shadow */
 
-  z-index: -1;
+  z-index: 1;
   color: #fff;
   transition: background 0.1s, box-shadow 0.1s, transform 0.1s;
 
