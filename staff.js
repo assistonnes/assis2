@@ -458,7 +458,7 @@ b.setAttribute("class", "music-font");
     
     const treble = document.createElementNS(SVG_NS,"text");    
     treble.setAttribute("x", leftMargin-34);    
-    treble.setAttribute("y", trebleBottom-10);    
+    treble.setAttribute("y", trebleBottom-15);    
     treble.setAttribute("font-size", 60);    
     treble.textContent = "\u{1D11E}"; //𝄞  
 treble.setAttribute("class", "music-font");
@@ -466,7 +466,7 @@ treble.setAttribute("class", "music-font");
     
     const bass = document.createElementNS(SVG_NS,"text");    
     bass.setAttribute("x", leftMargin-34);    
-    bass.setAttribute("y", bassBottom-8);    
+    bass.setAttribute("y", bassBottom-10);    
     bass.setAttribute("font-size", 60);    
     bass.textContent   = "\u{1D122}"; //𝄢     
 bass.setAttribute("class", "music-font");
