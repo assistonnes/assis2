@@ -104,7 +104,7 @@ body { display: flex; flex-direction: column; align-items: stretch; }
     linear-gradient(to bottom, #dcdcdc 0%, #bfbfbf 100%),
     radial-gradient(circle at top center, rgba(255,255,255,0.3) 0%, transparent 40%);
   box-shadow: inset 0 0 4px rgba(0,0,0,0.3);
-  transform: translateY(2px);
+  transform: translateY(-2px);
 }
 
 /* ---------- Black Keys ---------- */
@@ -161,7 +161,7 @@ body { display: flex; flex-direction: column; align-items: stretch; }
     inset 2px 0 3px rgba(255,255,255,0.05),
     inset -2px 0 3px rgba(0,0,0,0.2),
     0 2px 4px rgba(0,0,0,0.1);
-  transform: translateY(1.5px);
+  transform: translateY(-1.5px);
 }
   `;    
   const styleEl = document.createElement('style');    
