@@ -105,12 +105,9 @@ body { display: flex; flex-direction: column; align-items: stretch; }
   let keyHeight = 110;
 let keyWidth, blackKeyWidth, blackKeyHeight;
 
-function setInitialKeyWidth() {
-  const spacing = 1;
-  keyWidth = (pianoWrapper.clientWidth - (whiteKeys.length - 1) * spacing) / whiteKeys.length;
-  blackKeyWidth = keyWidth * 0.65;
-  blackKeyHeight = keyHeight * 0.6;
-}    
+const initialVisibleKeys = 12; // change this to whatever you like
+const spacing = 1;              // whiteKeySpacing
+
   const whiteKeys = [], blackKeys = [];    
   const keyOrder = [    
     "A0","A#0","B0","C1","C#1","D1","D#1","E1","F1","F#1","G1","G#1",    
@@ -175,13 +172,13 @@ function generateKeysOnce() {
 // global-ish holder for mapping created at generation time    
 let __whiteNoteToIndex = generateKeysOnce();  
 
-const initialVisibleKeys = 12; // change this to whatever you like
-const spacing = 1;              // whiteKeySpacing
+function setInitialKeyWidth() {
+  const spacing = 1;
+  keyWidth = (pianoWrapper.clientWidth - (initialVisibleKeys - 1) * spacing) / initialVisibleKeys;
+  blackKeyWidth = keyWidth * 0.65;
+  blackKeyHeight = keyHeight * 0.6;
+}    
 
-keyWidth = (pianoWrapper.clientWidth - (initialVisibleKeys - 1) * spacing) / initialVisibleKeys;
-blackKeyWidth = keyWidth * 0.65;
-blackKeyHeight = keyHeight * 0.6;  
-    
 // Improved updateKeyLayout    
 function updateKeyLayout() {    
   // layout white keys sequentially and set explicit left positions    
