@@ -433,7 +433,7 @@ function drawKeySignature() {
     const t = document.createElementNS(SVG_NS,"text");    
     t.setAttribute("x", trebleX + i * spacing);    
     t.setAttribute("y", trebleBaseY + trebleY[i]);    
-    t.setAttribute("font-size", 18);    
+    t.setAttribute("font-size", 25);    
     t.textContent = symbol;    
 t.setAttribute("class", "music-font");
     keySigGroup.appendChild(t);    
@@ -442,7 +442,7 @@ t.setAttribute("class", "music-font");
     const b = document.createElementNS(SVG_NS,"text");    
     b.setAttribute("x", bassX + i * spacing);    
     b.setAttribute("y", bassBaseY + bassY[i]);    
-    b.setAttribute("font-size", 18);    
+    b.setAttribute("font-size", 25);    
     b.textContent = symbol;    
 b.setAttribute("class", "music-font");
     keySigGroup.appendChild(b);    
@@ -540,7 +540,7 @@ notesGroup.appendChild(stem);
   const t = document.createElementNS(SVG_NS,"text");    
   t.setAttribute("x",noteX-16);    
   t.setAttribute("y",y+2);    
-  t.setAttribute("font-size",15);    
+  t.setAttribute("font-size",25);    
   t.textContent =
   acc === "##" ? "\u{1D12A}" : // 𝄪 
   acc === "#"  ? "\u{266F}"  : // ♯
