@@ -86,9 +86,10 @@
   const SVG_NS = "http://www.w3.org/2000/svg";    
   const W = 230, H = 230;    
     
-  const svg = document.createElementNS(SVG_NS, "svg");    
-  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);    
-  container.appendChild(svg);    
+  const svg = document.createElementNS(SVG_NS, "svg");
+svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+svg.setAttribute("style", "font-family: 'NotoMusic';");
+container.appendChild(svg);    
     
   const staticGroup = document.createElementNS(SVG_NS, "g");    
 const keySigGroup = document.createElementNS(SVG_NS, "g");    
@@ -461,7 +462,7 @@ b.setAttribute("class", "music-font");
     treble.setAttribute("x", leftMargin-34);    
     treble.setAttribute("y", trebleBottom);    
     treble.setAttribute("font-size", 60);    
-    treble.textContent = "𝄞";    
+    treble.textContent = "\uE050"; // gClef    
 treble.setAttribute("class", "music-font");
     staticGroup.appendChild(treble);    
     
@@ -469,7 +470,7 @@ treble.setAttribute("class", "music-font");
     bass.setAttribute("x", leftMargin-34);    
     bass.setAttribute("y", bassBottom-8);    
     bass.setAttribute("font-size", 60);    
-    bass.textContent = "𝄢";    
+    bass.textContent   = "\uE062"; // fClef    
 bass.setAttribute("class", "music-font");
     staticGroup.appendChild(bass);    
     
