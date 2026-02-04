@@ -120,13 +120,13 @@ body { display: flex; flex-direction: column; align-items: stretch; }
   /* 3D Gradient Base */
   background: 
     linear-gradient(to bottom, #333 0%, #111 100%),      /* base dark shading */
-    radial-gradient(circle at top center, rgba(255,255,255,0.15) 0%, transparent 40%); /* subtle shine */
+    radial-gradient(circle at top center, rgba(255,255,255,0.15) 0%, transparent 20%); /* subtle shine */
 
   /* Add side bevel / thickness illusion */
   box-shadow:
-    inset 2px 0 3px rgba(255,255,255,0.08),   /* left bevel */
+    inset 2px 0 3px rgba(255,255,255,0.5),   /* left bevel */
     inset -2px 0 3px rgba(0,0,0,0.5),        /* right shadow */
-    0 4px 6px rgba(0,0,0,0.1);               /* bottom drop shadow */
+    0 4px 3px rgba(0,0,0,0.5);               /* bottom drop shadow */
 
   z-index: 0.5;
   color: #fff;
