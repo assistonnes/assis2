@@ -192,63 +192,63 @@ const KEY_MAP = {
   },    
     
   E: {    
-    a:{slot:"C",acc:"#"},    
-    b:{slot:"C",acc:"##"},    
-    c:{slot:"D",acc:"#"},    
-    d:{slot:"D",acc:"##"},    
+    a:{slot:"C",acc:"n"},    
+    b:{slot:"C",acc:""},    
+    c:{slot:"D",acc:"n"},    
+    d:{slot:"D",acc:""},    
     e:{slot:"E",acc:""},    
-    f:{slot:"E",acc:"#"},  // F → E#    
-    g:{slot:"F",acc:"#"},    
-    h:{slot:"G",acc:"#"},    
-    i:{slot:"G",acc:"##"},    
-    j:{slot:"A",acc:""},    
+    f:{slot:"F",acc:"n"},  
+    g:{slot:"F",acc:""},    
+    h:{slot:"G",acc:"n"},  
+    i:{slot:"G",acc:""},    
+    j:{slot:"A",acc:""},  
     k:{slot:"A",acc:"#"},    
     l:{slot:"B",acc:""}    
   },    
     
   B: {    
-    a:{slot:"C",acc:"#"},    
-    b:{slot:"C",acc:"##"},    
-    c:{slot:"D",acc:"#"},    
-    d:{slot:"D",acc:"##"},    
-    e:{slot:"E",acc:"#"},  // E#    
-    f:{slot:"E",acc:"#"},  // F → E#    
-    g:{slot:"F",acc:"#"},    
-    h:{slot:"G",acc:"#"},    
-    i:{slot:"G",acc:"##"},    
-    j:{slot:"A",acc:"#"},    
-    k:{slot:"A",acc:"##"},    
+    a:{slot:"C",acc:"n"},    
+    b:{slot:"C",acc:""},    
+    c:{slot:"D",acc:"n"},    
+    d:{slot:"D",acc:""},    
+    e:{slot:"E",acc:""},  // E#    
+    f:{slot:"E",acc:"n"},  // F → E#    
+    g:{slot:"F",acc:""},    
+    h:{slot:"G",acc:"n"},    
+    i:{slot:"G",acc:""},    
+    j:{slot:"A",acc:"n"},    
+    k:{slot:"A",acc:""},    
     l:{slot:"B",acc:""}    
   },    
     
   "F#": {    
-    a:{slot:"C",acc:"b"},    
+    a:{slot:"C",acc:"n"},    
     b:{slot:"C",acc:""},    
-    c:{slot:"D",acc:"b"},    
+    c:{slot:"D",acc:"n"},    
     d:{slot:"D",acc:""},    
     e:{slot:"E",acc:"n"},      
     f:{slot:"E",acc:""},   // F → E#    
     g:{slot:"F",acc:""},    
-    h:{slot:"G",acc:"b"},    
+    h:{slot:"G",acc:"n"},    
     i:{slot:"G",acc:""},    
-    j:{slot:"A",acc:"b"},    
+    j:{slot:"A",acc:"n"},    
     k:{slot:"A",acc:""},    
     l:{slot:"B",acc:""}    
   },    
     
   "C#": {    
-    a:{slot:"C",acc:"#"},    
-    b:{slot:"C",acc:"##"},    
-    c:{slot:"D",acc:"#"},    
-    d:{slot:"D",acc:"##"},    
-    e:{slot:"E",acc:"#"},    
-    f:{slot:"E",acc:"##"},  // F → E##    
-    g:{slot:"F",acc:"#"},    
-    h:{slot:"G",acc:"#"},    
-    i:{slot:"G",acc:"##"},    
-    j:{slot:"A",acc:"#"},    
-    k:{slot:"A",acc:"##"},    
-    l:{slot:"B",acc:"#"}    
+    a:{slot:"C",acc:"n"},    
+    b:{slot:"C",acc:""},    
+    c:{slot:"D",acc:"n"},    
+    d:{slot:"D",acc:""},    
+    e:{slot:"E",acc:""},      
+    f:{slot:"F",acc:"n"},   // F → E#    
+    g:{slot:"F",acc:""},    
+    h:{slot:"G",acc:"n"},    
+    i:{slot:"G",acc:""},    
+    j:{slot:"A",acc:"n"},    
+    k:{slot:"A",acc:""},    
+    l:{slot:"B",acc:""}    
   },    
     
   F: {    
