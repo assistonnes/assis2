@@ -468,7 +468,7 @@ treble.setAttribute("class", "music-font");
     bass.setAttribute("x", leftMargin-34);    
     bass.setAttribute("y", bassBottom-8);    
     bass.setAttribute("font-size", 60);    
-    bass.textContent   = "U+1D122"; //𝄢     
+    bass.textContent   = "\u{1D122}"; //𝄢     
 bass.setAttribute("class", "music-font");
     staticGroup.appendChild(bass);    
     
@@ -542,10 +542,10 @@ notesGroup.appendChild(stem);
   t.setAttribute("y",y+2);    
   t.setAttribute("font-size",15);    
   t.textContent =
-  acc === "##" ? "U+1D12A" : // 𝄪  DOUBLE SHARP
-  acc === "#"  ? "U+266F"  : // ♯  SHARP
-  acc === "b"  ? "U+266D"  : // ♭  FLAT
-  acc === "n"  ? "U+266E"  : ""// ♮  NATURAL;
+  acc === "##" ? "\u{1D12A}" : // 𝄪 
+  acc === "#"  ? "\u{266F}"  : // ♯
+  acc === "b"  ? "\u{266D}"  : // ♭
+  acc === "n"  ? "\u{266E}"  : "" ; // ♮;
 t.setAttribute("class", "music-font");
   notesGroup.appendChild(t);    
 }    
