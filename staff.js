@@ -86,7 +86,7 @@
     
   const svg = document.createElementNS(SVG_NS, "svg");
 svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
-svg.setAttribute("style", "font-family: 'NotoMusic';");
+svg.setAttribute("style", "font-family: 'Bravura';");
 container.appendChild(svg);    
     
   const staticGroup = document.createElementNS(SVG_NS, "g");    
