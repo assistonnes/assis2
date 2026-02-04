@@ -237,7 +237,7 @@ const KEY_MAP = {
   },    
     
   "C#": {    
-    a:{slot:"B",acc:""},    
+    a:{slot:"B",acc:"", octaveShift:-1},   
     b:{slot:"C",acc:""},    
     c:{slot:"D",acc:"n"},    
     d:{slot:"D",acc:""},    
@@ -494,9 +494,9 @@ drawKeySignature();
     const keyTable = KEY_MAP[currentKey];    
     if (!keyTable || !keyTable[pianoId]) return;    
     
-    const { slot, acc } = keyTable[pianoId];    
-    
-    const step = octave*7 + STAFF_SLOT_INDEX[slot] - REF_STEP;    
+    const { slot, acc, octaveShift = 0 } = keyTable[pianoId];
+const realOctave = octave + octaveShift;
+const step = realOctave*7 + STAFF_SLOT_INDEX[slot] - REF_STEP; 
     const y = trebleBottom - step * half;    
     
     if (y < trebleTop)    
