@@ -102,7 +102,15 @@ body { display: flex; flex-direction: column; align-items: stretch; }
   // --- Audio & keys ---    
   let audioCtx;    
   const activeNotes = new Map(); // noteName → noteObj    
-  let keyWidth=23.5, keyHeight=110, blackKeyWidth=13.7, blackKeyHeight=66;    
+  let keyHeight = 110;
+let keyWidth, blackKeyWidth, blackKeyHeight;
+
+function setInitialKeyWidth() {
+  const spacing = 1;
+  keyWidth = (pianoWrapper.clientWidth - (whiteKeys.length - 1) * spacing) / whiteKeys.length;
+  blackKeyWidth = keyWidth * 0.65;
+  blackKeyHeight = keyHeight * 0.6;
+}    
   const whiteKeys = [], blackKeys = [];    
   const keyOrder = [    
     "A0","A#0","B0","C1","C#1","D1","D#1","E1","F1","F#1","G1","G#1",    
@@ -245,9 +253,10 @@ function updateKeyLayout() {
 }    
     
 // generate & layout once (regenerate map after creating keys)    
-__whiteNoteToIndex = generateKeysOnce();    
-updateKeyLayout();    
-updateThumb();    
+__whiteNoteToIndex = generateKeysOnce();
+setInitialKeyWidth();          // <-- NEW LINE
+updateKeyLayout();
+updateThumb();
     
   function playNote(note, velocity = 0.8) {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -486,8 +495,8 @@ function getMinKeyWidthToFit() {
 
   updateThumb();
 }
-  window.addEventListener('load', focusMiddleC);    
-  window.addEventListener('resize', focusMiddleC);    
+  window.addEventListener('load', () => { setInitialKeyWidth(); focusMiddleC(); });
+window.addEventListener('resize', () => { setInitialKeyWidth(); focusMiddleC(); });
     
   generateKeysOnce();    
   updateKeyLayout();    
