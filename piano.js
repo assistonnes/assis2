@@ -124,9 +124,9 @@ body { display: flex; flex-direction: column; align-items: stretch; }
 
   /* Add side bevel / thickness illusion */
   box-shadow:
-    inset 2px 0 3px rgba(255,255,255,0.5),   /* left bevel */
+    inset 2px 0 1px rgba(255,255,255,0.5),   /* left bevel */
     inset -2px 0 3px rgba(0,0,0,0.5),        /* right shadow */
-    0 4px 3px rgba(0,0,0,0.5);               /* bottom drop shadow */
+    0 2px 2px rgba(0,0,0,0.5);               /* bottom drop shadow */
 
   z-index: 0.5;
   color: #fff;
