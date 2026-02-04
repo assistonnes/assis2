@@ -542,10 +542,10 @@ notesGroup.appendChild(stem);
   t.setAttribute("y",y+2);    
   t.setAttribute("font-size",15);    
   t.textContent =
-  acc === "##" ? "𝄪" :
-  acc === "#"  ? "♯" :
-  acc === "b"  ? "♭" :
-  acc === "n"  ? "♮" : "";  
+  acc === "##" ? "U+1D12A" : // 𝄪  DOUBLE SHARP
+  acc === "#"  ? "U+266F"  : // ♯  SHARP
+  acc === "b"  ? "U+266D"  : // ♭  FLAT
+  acc === "n"  ? "U+266E"  : ""// ♮  NATURAL;
 t.setAttribute("class", "music-font");
   notesGroup.appendChild(t);    
 }    
