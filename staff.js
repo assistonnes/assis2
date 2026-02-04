@@ -387,7 +387,7 @@ const KEY_SIGNATURES = {
 const TREBLE_SHARP_Y = [ 5, 30, -2, 21, 46, 13, 38 ];    
 const TREBLE_FLAT_Y  = [ 6, 40, 16, 36, 12, 32, 8 ];    
     
-const BASS_SHARP_Y = [ 16, 40, 8, 32, 8, 28, 4 ];    
+const BASS_SHARP_Y = [ 16, 40, 8, 32, 8, 50, 12 ];    
 const BASS_FLAT_Y  = [ 28, 8, 32, 12, 36, 16, 40 ];    
     
   /* =======================    
