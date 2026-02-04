@@ -126,7 +126,7 @@ body { display: flex; flex-direction: column; align-items: stretch; }
   box-shadow:
     inset 2px 0 3px rgba(255,255,255,0.08),   /* left bevel */
     inset -2px 0 3px rgba(0,0,0,0.5),        /* right shadow */
-    0 4px 6px rgba(0,0,0,0.5);               /* bottom drop shadow */
+    0 4px 6px rgba(0,0,0,0);               /* bottom drop shadow */
 
   z-index: 1;
   color: #fff;
