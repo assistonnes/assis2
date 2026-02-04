@@ -460,7 +460,7 @@ b.setAttribute("class", "music-font");
     treble.setAttribute("x", leftMargin-34);    
     treble.setAttribute("y", trebleBottom);    
     treble.setAttribute("font-size", 60);    
-    treble.textContent = "U+1D11E"; //𝄞  
+    treble.textContent = U+1D11E; //𝄞  
 treble.setAttribute("class", "music-font");
     staticGroup.appendChild(treble);    
     
