@@ -102,7 +102,7 @@ body { display: flex; flex-direction: column; align-items: stretch; }
   // --- Audio & keys ---    
   let audioCtx;    
   const activeNotes = new Map(); // noteName → noteObj    
-  let keyHeight = 110;
+  let keyHeight = 120;
 let keyWidth, blackKeyWidth, blackKeyHeight;
 
 const initialVisibleKeys = 12; // change this to whatever you like
