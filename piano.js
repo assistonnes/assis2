@@ -119,18 +119,21 @@ body { display: flex; flex-direction: column; align-items: stretch; }
 
   /* 3D Gradient Base */
   background: 
-    linear-gradient(to bottom, #444 0%, #111 100%), /* base dark shading */
+    linear-gradient(to bottom, #333 0%, #111 100%),      /* base dark shading */
     radial-gradient(circle at top center, rgba(255,255,255,0.15) 0%, transparent 40%); /* subtle shine */
 
-  color: #fff;
-  z-index: 1;
+  /* Add side bevel / thickness illusion */
+  box-shadow:
+    inset 2px 0 3px rgba(255,255,255,0.08),   /* left bevel */
+    inset -2px 0 3px rgba(0,0,0,0.5),        /* right shadow */
+    0 4px 6px rgba(0,0,0,0.5);               /* bottom drop shadow */
 
-  /* Depth */
-  box-shadow: 
-    inset 0 -2px 4px rgba(255,255,255,0.1), /* subtle inner shine */
-    0 3px 5px rgba(0,0,0,0.5);
-  
+  z-index: 2;
+  color: #fff;
   transition: background 0.1s, box-shadow 0.1s, transform 0.1s;
+
+  /* Slightly taller to overlap white keys more naturally */
+  height: 65%; /* tweak as needed with your keyHeight */
 }
 
 /* Black key label */
@@ -154,7 +157,10 @@ body { display: flex; flex-direction: column; align-items: stretch; }
   background: 
     linear-gradient(to bottom, #222 0%, #000 100%),
     radial-gradient(circle at top center, rgba(255,255,255,0.05) 0%, transparent 40%);
-  box-shadow: inset 0 0 4px rgba(0,0,0,0.5);
+  box-shadow:
+    inset 2px 0 3px rgba(255,255,255,0.05),
+    inset -2px 0 3px rgba(0,0,0,0.7),
+    0 2px 4px rgba(0,0,0,0.7);
   transform: translateY(1.5px);
 }
   `;    
