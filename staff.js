@@ -237,18 +237,18 @@ const KEY_MAP = {
   },    
     
   "C#": {    
-    a:{slot:"C",acc:"n"},    
+    a:{slot:"B",acc:""},    
     b:{slot:"C",acc:""},    
     c:{slot:"D",acc:"n"},    
     d:{slot:"D",acc:""},    
-    e:{slot:"E",acc:""},      
-    f:{slot:"F",acc:"n"},   // F → E#    
+    e:{slot:"E",acc:"n"},      
+    f:{slot:"E",acc:""},   // F → E#    
     g:{slot:"F",acc:""},    
     h:{slot:"G",acc:"n"},    
     i:{slot:"G",acc:""},    
     j:{slot:"A",acc:"n"},    
     k:{slot:"A",acc:""},    
-    l:{slot:"B",acc:""}    
+    l:{slot:"B",acc:"n"}    
   },    
     
   F: {    
@@ -260,8 +260,8 @@ const KEY_MAP = {
     f:{slot:"F",acc:""},    
     g:{slot:"G",acc:"b"},    
     h:{slot:"G",acc:""},    
-    i:{slot:"A",acc:"b"},    
-    j:{slot:"A",acc:""},    
+    i:{slot:"A",acc:""},    
+    j:{slot:"B",acc:""},    
     k:{slot:"B",acc:"b"},    
     l:{slot:"B",acc:""}    
   },    
