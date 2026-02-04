@@ -7,14 +7,12 @@
   const css = `    
 
 @font-face {
-  font-family: "NotoMusic";
-  src: url("./NotoMusic-Regular.ttf") format("truetype");
-  font-weight: normal;
-  font-style: normal;
+  font-family: "Bravura";
+  src: url("./Bravura.otf") format("opentype");
 }
 
 .music-font {
-  font-family: "NotoMusic";}
+  font-family: "Bravura";}
 
   #controls-wrapper {    
     position: relative;    
