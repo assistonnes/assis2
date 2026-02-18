@@ -260,100 +260,100 @@ const KEY_MAP = {
     f:{slot:"F",acc:""},    
     g:{slot:"G",acc:"b"},    
     h:{slot:"G",acc:""},    
-    i:{slot:"A",acc:""},    
-    j:{slot:"B",acc:""},    
-    k:{slot:"B",acc:"b"},    
-    l:{slot:"B",acc:""}    
+    i:{slot:"A",acc:"b"},    
+    j:{slot:"A",acc:""},    
+    k:{slot:"B",acc:""},    
+    l:{slot:"B",acc:"n"}    
   },    
     
   Bb: {    
-    a:{slot:"D",acc:"b"},    
-    b:{slot:"D",acc:""},    
-    c:{slot:"E",acc:"b"},    
+    a:{slot:"C",acc:""},    
+    b:{slot:"D",acc:"b"},    
+    c:{slot:"D",acc:""},    
     d:{slot:"E",acc:""},    
-    e:{slot:"F",acc:""},    
-    f:{slot:"G",acc:"b"},    
-    g:{slot:"G",acc:""},    
-    h:{slot:"A",acc:"b"},    
-    i:{slot:"A",acc:""},    
-    j:{slot:"B",acc:"b"},    
+    e:{slot:"E",acc:"n"},    
+    f:{slot:"F",acc:""},    
+    g:{slot:"G",acc:"b"},    
+    h:{slot:"G",acc:""},    
+    i:{slot:"A",acc:"b"},    
+    j:{slot:"A",acc:""},    
     k:{slot:"B",acc:""},    
-    l:{slot:"C",acc:""}    
+    l:{slot:"B",acc:"n"}
   },    
     
   Eb: {    
-    a:{slot:"E",acc:"b"},    
-    b:{slot:"E",acc:""},    
-    c:{slot:"F",acc:""},    
-    d:{slot:"G",acc:"b"},    
-    e:{slot:"G",acc:""},    
-    f:{slot:"A",acc:"b"},    
-    g:{slot:"A",acc:""},    
-    h:{slot:"B",acc:"b"},    
-    i:{slot:"B",acc:""},    
-    j:{slot:"C",acc:""},    
-    k:{slot:"D",acc:"b"},    
-    l:{slot:"D",acc:""}    
+    a:{slot:"C",acc:""},    
+    b:{slot:"D",acc:"b"},    
+    c:{slot:"D",acc:""},    
+    d:{slot:"E",acc:""},    
+    e:{slot:"E",acc:"n"},    
+    f:{slot:"F",acc:""},    
+    g:{slot:"G",acc:"b"},    
+    h:{slot:"G",acc:""},    
+    i:{slot:"A",acc:""},    
+    j:{slot:"A",acc:"n"},    
+    k:{slot:"B",acc:""},    
+    l:{slot:"B",acc:"n"}
   },    
     
   Ab: {    
-    a:{slot:"A",acc:"b"},    
-    b:{slot:"A",acc:""},    
-    c:{slot:"B",acc:"b"},    
-    d:{slot:"B",acc:""},    
-    e:{slot:"C",acc:""},    
-    f:{slot:"D",acc:"b"},    
-    g:{slot:"D",acc:""},    
-    h:{slot:"E",acc:"b"},    
-    i:{slot:"E",acc:""},    
-    j:{slot:"F",acc:""},    
-    k:{slot:"G",acc:"b"},    
-    l:{slot:"G",acc:""}    
+    a:{slot:"C",acc:""},    
+    b:{slot:"D",acc:""},    
+    c:{slot:"D",acc:"n"},    
+    d:{slot:"E",acc:""},    
+    e:{slot:"E",acc:"n"},    
+    f:{slot:"F",acc:""},    
+    g:{slot:"G",acc:"b"},    
+    h:{slot:"G",acc:""},    
+    i:{slot:"A",acc:""},    
+    j:{slot:"A",acc:"n"},    
+    k:{slot:"B",acc:""},    
+    l:{slot:"B",acc:"n"}
   },    
     
   Db: {    
     a:{slot:"C",acc:""},    
     b:{slot:"D",acc:""},    
-    c:{slot:"D",acc:"b"},    
+    c:{slot:"D",acc:"n"},    
     d:{slot:"E",acc:""},    
-    e:{slot:"E",acc:"b"},    
+    e:{slot:"E",acc:"n"},    
     f:{slot:"F",acc:""},    
     g:{slot:"G",acc:""},    
-    h:{slot:"G",acc:"b"},    
+    h:{slot:"G",acc:"n"},    
     i:{slot:"A",acc:""},    
-    j:{slot:"B",acc:"b"},    
+    j:{slot:"A",acc:"n"},    
     k:{slot:"B",acc:""},    
-    l:{slot:"C",acc:""}    
+    l:{slot:"B",acc:"n"}
   },    
     
   Gb: {    
-    a:{slot:"G",acc:"b"},    
-    b:{slot:"G",acc:""},    
-    c:{slot:"A",acc:"b"},    
-    d:{slot:"A",acc:""},    
-    e:{slot:"B",acc:"b"},    
-    f:{slot:"C",acc:"b"},    
-    g:{slot:"C",acc:""},    
-    h:{slot:"D",acc:"b"},    
-    i:{slot:"D",acc:""},    
-    j:{slot:"E",acc:"b"},    
-    k:{slot:"E",acc:""},    
-    l:{slot:"F",acc:""}    
+    a:{slot:"C",acc:"n"},    
+    b:{slot:"D",acc:""},    
+    c:{slot:"D",acc:"n"},    
+    d:{slot:"E",acc:""},    
+    e:{slot:"E",acc:"n"},    
+    f:{slot:"F",acc:""},    
+    g:{slot:"G",acc:""},    
+    h:{slot:"G",acc:"n"},    
+    i:{slot:"A",acc:""},    
+    j:{slot:"A",acc:"n"},    
+    k:{slot:"B",acc:""},    
+    l:{slot:"C",acc:"",octaveShift:+1}
   },    
     
   Cb: {    
-    a:{slot:"C",acc:"b"},    
-    b:{slot:"C",acc:""},    
-    c:{slot:"D",acc:"b"},    
-    d:{slot:"D",acc:""},    
-    e:{slot:"E",acc:"b"},    
-    f:{slot:"F",acc:"b"},    
-    g:{slot:"F",acc:""},    
-    h:{slot:"G",acc:"b"},    
-    i:{slot:"G",acc:""},    
-    j:{slot:"A",acc:"b"},    
-    k:{slot:"A",acc:""},    
-    l:{slot:"B",acc:"b"}    
+    a:{slot:"C",acc:"n"},    
+    b:{slot:"D",acc:""},    
+    c:{slot:"D",acc:"n"},    
+    d:{slot:"E",acc:""},    
+    e:{slot:"F",acc:""},    
+    f:{slot:"F",acc:"n"},    
+    g:{slot:"G",acc:""},    
+    h:{slot:"G",acc:"n"},    
+    i:{slot:"A",acc:""},    
+    j:{slot:"A",acc:"n"},    
+    k:{slot:"B",acc:""},    
+    l:{slot:"C",acc:"",octaveShift:+1}
   }    
     
 };    
@@ -384,11 +384,11 @@ const KEY_SIGNATURES = {
 };    
     
 // relative to staff top line    
-const TREBLE_SHARP_Y = [ 5, 30, -2, 21, 46, 13, 38 ];    
-const TREBLE_FLAT_Y  = [ 6, 40, 16, 36, 12, 32, 8 ];    
+const TREBLE_SHARP_Y = [ 0.5, 25, -7, 16, 40, 8, 32 ];    
+const TREBLE_FLAT_Y  = [ 32, 8, 40, 16, 48, 25, 57 ];    
     
-const BASS_SHARP_Y = [ 16, 40, 8, 32, 68, 23, 43 ];    
-const BASS_FLAT_Y  = [ 28, 8, 32, 12, 36, 16, 40 ];    
+const BASS_SHARP_Y = [ 16, 40, 8, 32, 56, 24, 48 ];    
+const BASS_FLAT_Y  = [ 48, 24, 56, 32, 64, 40, 72 ];    
     
   /* =======================    
      STATIC DRAW    
@@ -620,5 +620,8 @@ window.staffNoteOff = function(noteName) {
     notesGroup.innerHTML = "";    
   });    
     
-  drawStatic();    
+  const selector = document.getElementById("key-selector");
+
+currentKey = selector.value;   // read selected option
+drawStatic(); 
 })();
