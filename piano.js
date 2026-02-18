@@ -32,7 +32,7 @@ body { display: flex; flex-direction: column; align-items: stretch; }
   border-radius: 8px;
   position: absolute;
   left: 0;
-  min-width: 40px;
+  min-width: 0px;
 }
 #zoom-out, #zoom-in {
   width: 30px;
@@ -163,10 +163,105 @@ body { display: flex; flex-direction: column; align-items: stretch; }
     0 2px 4px rgba(0,0,0,0.1);
   transform: translateY(0px);
 }
+/* ===== Measurement Tape ===== */
+#measure-wrapper {
+  position: relative;
+  width: 100%;
+  height: 36px;
+  overflow: hidden;
+  background: #eee;
+  border-bottom: 1px solid #bbb;
+  cursor: grab;
+  z-index: 10;             /* add this */
+  margin-bottom: -10px; /* overlap amount */
+  box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+}
+
+#measure-wrapper:active {
+  cursor: grabbing;
+}
+
+#measure-tape {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+}
+
+.measure-tick {
+  position: absolute;
+  bottom: 0;
+  width: 1px;
+  background: #333;
+}
+
+.measure-tick.major {
+  height: 18px;
+}
+
+.measure-tick.minor {
+  height: 10px;
+}
+
+.measure-label {
+  position: absolute;
+  bottom: 18px;
+  font-size: 10px;
+  color: #333;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
   `;    
   const styleEl = document.createElement('style');    
   styleEl.textContent = css;    
-  document.head.appendChild(styleEl);    
+  document.head.appendChild(styleEl); 
+  
+  // ===== Scale definitions =====
+const SCALES = {
+  chromatic: [0,1,2,3,4,5,6,7,8,9,10,11],
+  diatonic:  [0,2,4,5,7,9,11],
+  pentatonic:[0,2,4,7,9],
+  blues:     [0,3,5,6,7,10]
+};
+
+let rulerScale = 'diatonic';
+let rulerRoot = 'C';        // musical anchor
+let rulerDisplayLabel = 'R'; // what is printed
+
+// ===== Ruler unit system =====
+let BASE_SEMITONE_UNIT = 18.5;   // musical unit at 1× zoom
+let SEMITONE_UNIT;
+let RULER_OFFSET = 0;    // fine-tune global alignment if needed
+let baseKeyWidth = 0;
+
+function getCMidpoint() {
+  const c4 = whiteKeys.find(k => k.dataset.note === 'C4');
+  if (!c4) return 0;
+  return parseFloat(c4.style.left) + keyWidth / 2;
+}
+
+// ===== Scale helpers =====
+function pitchClass(note) {
+  return note.replace(/[0-9]/g, ''); // "C4" → "C"
+}
+
+function noteInScale(note, root, scaleName) {
+  const scale = SCALES[scaleName];
+  if (!scale) return false;
+
+  const NOTES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+
+  const notePC = pitchClass(note);
+  const rootIndex = NOTES.indexOf(root);
+  const noteIndex = NOTES.indexOf(notePC);
+
+  if (rootIndex === -1 || noteIndex === -1) return false;
+
+  const interval = (noteIndex - rootIndex + 12) % 12;
+  return scale.includes(interval);
+}
     
   // --- Create DOM ---    
   const pianoUnit = document.createElement('div'); pianoUnit.id = 'piano-unit'; document.body.appendChild(pianoUnit);    
@@ -176,6 +271,16 @@ body { display: flex; flex-direction: column; align-items: stretch; }
   const btnScrollLeftKey = document.createElement('button'); btnScrollLeftKey.id='scroll-left-key'; btnScrollLeftKey.textContent='<';    
   const btnZoomOut = document.createElement('button'); btnZoomOut.id='zoom-out'; btnZoomOut.textContent='-';    
   leftGroup.append(btnScrollLeftOct, btnScrollLeftKey, btnZoomOut);    
+  
+  // --- Measurement tape ---
+const measureWrapper = document.createElement('div');
+measureWrapper.id = 'measure-wrapper';
+
+const measureTape = document.createElement('div');
+measureTape.id = 'measure-tape';
+
+measureWrapper.appendChild(measureTape);
+
     
   const scrollBar = document.createElement('div'); scrollBar.id='piano-scrollbar';    
   const scrollThumb = document.createElement('div'); scrollThumb.id='piano-scroll-thumb'; scrollBar.appendChild(scrollThumb);    
@@ -187,7 +292,8 @@ body { display: flex; flex-direction: column; align-items: stretch; }
   rightGroup.append(btnZoomIn, btnScrollRightKey, btnScrollRightOct);    
     
   scrollbarContainer.append(leftGroup, scrollBar, rightGroup);    
-  pianoUnit.appendChild(scrollbarContainer);    
+  pianoUnit.appendChild(scrollbarContainer);
+  pianoUnit.appendChild(measureWrapper);
     
   const pianoWrapper = document.createElement('div'); pianoWrapper.id='piano-wrapper';    
   const pianoContainer = document.createElement('div'); pianoContainer.id='piano-container';    
@@ -271,17 +377,36 @@ function generateKeysOnce() {
 // global-ish holder for mapping created at generation time    
 let __whiteNoteToIndex = generateKeysOnce();  
 
+let initialLayoutDone = false;
+
 function setInitialKeyWidth() {
   const spacing = 1;
-  keyWidth = (pianoWrapper.clientWidth - (initialVisibleKeys - 1) * spacing) / initialVisibleKeys;
+
+  // Base layout: how many keys visible
+  keyWidth =
+    (pianoWrapper.clientWidth - (initialVisibleKeys - 1) * spacing) /
+    initialVisibleKeys;
+
   blackKeyWidth = keyWidth * 0.65;
   blackKeyHeight = keyHeight * 0.6;
-}    
+
+  // 🔒 DO NOT reset zoomRatio here
+  // 🔒 DO NOT touch SEMITONE_UNIT directly
+
+  // Base ruler unit derived from keyWidth
+  baseKeyWidth = keyWidth;
+BASE_SEMITONE_UNIT = keyWidth * (7 / 12);
+SEMITONE_UNIT = BASE_SEMITONE_UNIT;
+
+  updateKeyLayout();
+  updateMeasurementTape();
+  updateThumb();
+}
 
 // Improved updateKeyLayout    
 function updateKeyLayout() {    
   // layout white keys sequentially and set explicit left positions    
-  let whiteKeySpacing = 1; // 🔧 try 0.2 or -0.2 for fine tuning    
+  let whiteKeySpacing = 0; // 🔧 try 0.2 or -0.2 for fine tuning    
     
   let left = 0;    
   whiteKeys.forEach((wk, i) => {    
@@ -353,14 +478,54 @@ function updateKeyLayout() {
     bk.style.height = blackKeyHeight + 'px';    
     bk.style.left = leftForBk + 'px';    
   });    
+  const totalWidth = whiteKeys.length * keyWidth;
+pianoContainer.style.width = totalWidth + 'px';
 }    
+let tapeUserOffset = 0; // user drag offset (independent)
+function updateMeasurementTape() {
+  measureTape.innerHTML = '';
+
+  const cMid = getCMidpoint();
+  const totalSemitones = keyOrder.length;
+
+  // Set tape width large enough
+  measureTape.style.width =
+    (totalSemitones * SEMITONE_UNIT) + 'px';
     
-// generate & layout once (regenerate map after creating keys)    
-__whiteNoteToIndex = generateKeysOnce();
-setInitialKeyWidth();          // <-- NEW LINE
-updateKeyLayout();
-updateThumb();
-    
+    const pianoWidth = pianoContainer.scrollWidth;
+measureTape.style.width =
+  Math.max(pianoWidth, totalSemitones * SEMITONE_UNIT) + 'px';
+
+  keyOrder.forEach((note, i) => {
+    if (!noteInScale(note, rulerRoot, rulerScale)) return;
+
+    const x =
+      cMid +
+      (i - keyOrder.indexOf('C4')) * SEMITONE_UNIT +
+      RULER_OFFSET;
+
+    const tick = document.createElement('div');
+    tick.className = 'measure-tick major';
+    tick.style.left = x + 'px';
+    measureTape.appendChild(tick);
+
+    // Label only root pitch class
+    if (pitchClass(note) === rulerRoot) {
+      const label = document.createElement('div');
+      label.className = 'measure-label';
+      label.style.left = x + 'px';
+      label.textContent = rulerDisplayLabel;
+      measureTape.appendChild(label);
+    }
+  });
+
+  // scroll sync
+  measureTape.style.left =
+    (-pianoWrapper.scrollLeft + tapeUserOffset * SEMITONE_UNIT) + 'px';
+}
+
+setInitialKeyWidth();
+
   function playNote(note, velocity = 0.8) {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   if (audioCtx.state === "suspended") audioCtx.resume();
@@ -499,37 +664,42 @@ function getTotalPianoWidthForKeyWidth(testKeyWidth) {
 }
 
 function getExactFitKeyWidth() {
-  const spacing = 1;
-  const available = pianoWrapper.clientWidth
-                  - (whiteKeys.length - 1) * spacing;
-  return available / whiteKeys.length;
+  const spacing = 0; // must match whiteKeySpacing in layout
+  return (
+    pianoWrapper.clientWidth
+    - (whiteKeys.length - 1) * spacing
+  ) / whiteKeys.length;
 }
 
-// --- Zoom ---
+let zoomRatio = 1;
+
 function zoomKeys(factor) {
   const centerRatio = getCenterRatio();
 
   const MAX_KEY_WIDTH = 110;
-  const ABSOLUTE_MIN = 8;
 
   let newKeyWidth = keyWidth * factor;
 
   const fitKeyWidth = getExactFitKeyWidth();
-  const minAllowed = Math.max(ABSOLUTE_MIN, fitKeyWidth);
 
-  // If zooming out, clamp ONLY when piano would fit
-  if (factor < 1) {
-    const testWidth = getTotalPianoWidthForKeyWidth(newKeyWidth);
-
-    if (testWidth <= pianoWrapper.clientWidth) {
-      newKeyWidth = fitKeyWidth;
-    }
+  // ✅ Clamp ONLY to full-fit size when zooming out
+  if (newKeyWidth < fitKeyWidth) {
+    newKeyWidth = fitKeyWidth;
   }
 
-  keyWidth = Math.min(
-    Math.max(newKeyWidth, minAllowed),
-    MAX_KEY_WIDTH
-  );
+  // ✅ Clamp max
+  if (newKeyWidth > MAX_KEY_WIDTH) {
+    newKeyWidth = MAX_KEY_WIDTH;
+  }
+
+  keyWidth = newKeyWidth;
+
+  // --- Update zoom ratio (measurement scaling) ---
+  zoomRatio = keyWidth / baseKeyWidth;
+
+  // Base semitone must be defined once at init:
+  // BASE_SEMITONE_UNIT = baseKeyWidth * (7 / 12);
+  SEMITONE_UNIT = BASE_SEMITONE_UNIT * zoomRatio;
 
   blackKeyWidth = keyWidth * 0.65;
   blackKeyHeight = keyHeight * 0.6;
@@ -537,6 +707,7 @@ function zoomKeys(factor) {
   updateKeyLayout();
   restoreCenterFromRatio(centerRatio);
   updateThumb();
+  updateMeasurementTape();
 
   if (window.updateUnitScale) {
     window.updateUnitScale();
@@ -565,8 +736,10 @@ function getMinKeyWidthToFit() {
   return (pianoWrapper.clientWidth - totalSpacing) / whiteKeyCount;
 }
     
-  pianoWrapper.addEventListener('scroll', updateThumb);    
-  window.addEventListener('resize', updateThumb);    
+  pianoWrapper.addEventListener('scroll', function () {
+  updateThumb();
+  updateMeasurementTape();
+});
     
   let isDragging=false, startX, startLeft;    
   function startDrag(x){ isDragging=true; startX=x; startLeft=parseFloat(scrollThumb.style.left)||0; }    
@@ -603,12 +776,56 @@ function getMinKeyWidthToFit() {
 
   updateThumb();
 }
-  window.addEventListener('load', () => { setInitialKeyWidth(); focusMiddleC(); });
-window.addEventListener('resize', () => { setInitialKeyWidth(); focusMiddleC(); });
-    
-  generateKeysOnce();    
-  updateKeyLayout();    
-  updateThumb();    
+//drag logic start
+let tapeDragging = false;
+let tapeStartX = 0;
+let tapeStartOffset = 0;
+
+measureWrapper.addEventListener('mousedown', e => {
+  tapeDragging = true;
+  tapeStartX = e.clientX;
+  tapeStartOffset = tapeUserOffset;
+});
+
+document.addEventListener('mousemove', e => {
+  if (!tapeDragging) return;
+  const dx = e.clientX - tapeStartX;
+  tapeUserOffset = tapeStartOffset + dx / SEMITONE_UNIT;
+  updateMeasurementTape();
+});
+
+document.addEventListener('mouseup', () => {
+  tapeDragging = false;
+});
+
+// touch
+measureWrapper.addEventListener('touchstart', e => {
+  tapeDragging = true;
+  tapeStartX = e.touches[0].clientX;
+  tapeStartOffset = tapeUserOffset;
+}, { passive: false });
+
+document.addEventListener('touchmove', e => {
+  if (!tapeDragging) return;
+  const dx = e.touches[0].clientX - tapeStartX;
+  tapeUserOffset = tapeStartOffset + dx / SEMITONE_UNIT;
+  updateMeasurementTape();
+  e.preventDefault();
+}, { passive: false });
+
+document.addEventListener('touchend', () => {
+  tapeDragging = false;
+});
+//drag logic end
+
+  window.addEventListener('load', () => { 
+  focusMiddleC(); 
+});
+window.addEventListener('resize', () => {
+  focusMiddleC();
+  updateThumb();
+  updateMeasurementTape();
+});
     
   // --- Access individual key attributes ---    
   function getKeyAttributes(note){    
