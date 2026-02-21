@@ -37,7 +37,7 @@ body { display: flex; flex-direction: column; align-items: stretch; }
 #zoom-out, #zoom-in {
   width: 30px;
   height: 30px;
-  font-size: 18px;
+  font-size: 16px;
   cursor: pointer;
 }
 
@@ -54,6 +54,32 @@ body { display: flex; flex-direction: column; align-items: stretch; }
   font-size: 16px;
   cursor: pointer;
 }
+
+#zoom-out, #zoom-in,
+#scroll-left-key, #scroll-right-key,
+#scroll-left-octave, #scroll-right-octave {
+
+  -webkit-appearance: none;
+  appearance: none;
+
+  border: 1px solid #999;
+  border-radius: 4px;
+
+  padding: 0;
+  margin: 0;
+
+  background: #eee;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-sizing: border-box;
+
+  font-weight: normal;
+  color: #000;
+}
+
 /* Piano wrapper and keys */    
 #piano-wrapper { height: 200px; overflow-x: auto; overflow-y: visible; -webkit-overflow-scrolling: touch; position: relative; margin: 0; padding: 0; display: flex; align-items: flex-start; }    
 #piano-wrapper::-webkit-scrollbar { display: none; }    
@@ -128,7 +154,7 @@ body { display: flex; flex-direction: column; align-items: stretch; }
     inset -3px 0 1px rgba(0,0,0,0),        /* right shadow */
     0 2px 1.5px rgba(0,0,0,0.5);               /* bottom drop shadow */
 
-  z-index: 0.5;
+  z-index: 1;
   color: #fff;
   transition: background 0.1s, box-shadow 0.1s, transform 0.1s;
 
@@ -175,6 +201,7 @@ body { display: flex; flex-direction: column; align-items: stretch; }
   z-index: 10;             /* add this */
   margin-bottom: -10px; /* overlap amount */
   box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+  background: rgba(255,255,255);
 }
 
 #measure-wrapper:active {
@@ -188,6 +215,7 @@ body { display: flex; flex-direction: column; align-items: stretch; }
   height: 100%;
   display: flex;
   align-items: flex-end;
+  
 }
 
 .measure-tick {
@@ -378,7 +406,7 @@ function generateKeysOnce() {
 let __whiteNoteToIndex = generateKeysOnce();  
 
 let initialLayoutDone = false;
-
+let whiteKeySpacing = 1; // 🔧 try 0.2 or -0.2 for fine tuning 
 function setInitialKeyWidth() {
   const spacing = 1;
 
@@ -395,7 +423,7 @@ function setInitialKeyWidth() {
 
   // Base ruler unit derived from keyWidth
   baseKeyWidth = keyWidth;
-BASE_SEMITONE_UNIT = keyWidth * (7 / 12);
+BASE_SEMITONE_UNIT = (keyWidth + whiteKeySpacing) * (7 / 12);
 SEMITONE_UNIT = BASE_SEMITONE_UNIT;
 
   updateKeyLayout();
@@ -406,7 +434,7 @@ SEMITONE_UNIT = BASE_SEMITONE_UNIT;
 // Improved updateKeyLayout    
 function updateKeyLayout() {    
   // layout white keys sequentially and set explicit left positions    
-  let whiteKeySpacing = 0; // 🔧 try 0.2 or -0.2 for fine tuning    
+     
     
   let left = 0;    
   whiteKeys.forEach((wk, i) => {    
@@ -699,7 +727,8 @@ function zoomKeys(factor) {
 
   // Base semitone must be defined once at init:
   // BASE_SEMITONE_UNIT = baseKeyWidth * (7 / 12);
-  SEMITONE_UNIT = BASE_SEMITONE_UNIT * zoomRatio;
+  BASE_SEMITONE_UNIT = (keyWidth + whiteKeySpacing) * (7 / 12);
+SEMITONE_UNIT = BASE_SEMITONE_UNIT;
 
   blackKeyWidth = keyWidth * 0.65;
   blackKeyHeight = keyHeight * 0.6;
