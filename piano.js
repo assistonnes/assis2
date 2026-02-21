@@ -130,7 +130,7 @@ body { display: flex; flex-direction: column; align-items: stretch; }
     linear-gradient(to bottom, #dcdcdc 0%, #bfbfbf 100%),
     radial-gradient(circle at top center, rgba(255,255,255,0.3) 0%, transparent 40%);
   box-shadow: inset 0 0 4px rgba(0,0,0,0.3);
-  transform: translateY(-2px);
+  transform: translateY(0px);
 }
 
 /* ---------- Black Keys ---------- */
@@ -145,14 +145,13 @@ body { display: flex; flex-direction: column; align-items: stretch; }
 
   /* 3D Gradient Base */
   background: 
-    linear-gradient(to bottom, #333 0%, #111 100%),      /* base dark shading */
-    radial-gradient(circle at top center, rgba(255,255,255,0.15) 0%, transparent 20%); /* subtle shine */
-
+    linear-gradient(to bottom, #111 0%, #333 100%),
+    radial-gradient(circle at top center, rgba(255,255,255,0.15) 0%, transparent 20%);
+    
   /* Add side bevel / thickness illusion */
   box-shadow:
-    inset 3px 0 1.5px rgba(255,255,255,0.5),   /* left bevel */
-    inset -3px 0 1px rgba(0,0,0,0),        /* right shadow */
-    0 2px 1.5px rgba(0,0,0,0.5);               /* bottom drop shadow */
+    inset 0px -2px 1.5px rgba(255,255,255,0.7),        /* highlight */
+    1.5px 1px 1.8px 1px rgba(0,0,0,0.5);               /* drop shadow */
 
   z-index: 1;
   color: #fff;
@@ -181,12 +180,11 @@ body { display: flex; flex-direction: column; align-items: stretch; }
 /* Press animation */
 .black-key.pressed {
   background: 
-    linear-gradient(to bottom, #222 0%, #000 100%),
+    linear-gradient(to bottom, #000 0%, #222 100%),
     radial-gradient(circle at top center, rgba(255,255,255,0.05) 0%, transparent 40%);
   box-shadow:
-    inset 2px 0 3px rgba(255,255,255,0.05),
-    inset -2px 0 3px rgba(0,0,0,0.2),
-    0 2px 4px rgba(0,0,0,0.1);
+    inset 0px -2px 1.5px rgba(255,255,255,0.5),
+    1.2px 1px 1.8px 0.5px rgba(0,0,0,0.5);
   transform: translateY(0px);
 }
 /* ===== Measurement Tape ===== */
