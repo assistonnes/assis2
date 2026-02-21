@@ -22,17 +22,6 @@
     align-items: center;    
     padding: 10px;    
   }    
-  #key-select-wrapper {    
-    position: absolute;    
-    right: 50%;    
-    transform: translate(-160%, -50%);    
-    top: 50%;    
-    min-width: 60px;    
-    text-align: right;    
-    z-index: 10;    
-    font-family: system-ui, sans-serif;    
-    font-size: 14px;    
-  }    
   #image-placeholder {    
     transform: translate(-8%, 0%);    
     width: 150px;    
@@ -61,19 +50,10 @@
   ======================= */    
   const wrapper = document.createElement("div");    
   wrapper.id = "controls-wrapper";    
-  wrapper.innerHTML = `    
-    <div id="key-select-wrapper">    
-      Key:    
-      <select id="key-selector">    
-        <option>C</option><option>G</option><option>D</option><option>A</option>    
-        <option>E</option><option>B</option><option>F#</option><option>C#</option>    
-        <option>F</option><option>Bb</option><option>Eb</option><option>Ab</option>    
-        <option>Db</option><option>Gb</option><option>Cb</option>    
-      </select>    
-    </div>    
-    <div id="image-placeholder"></div>    
-  `;    
-  document.body.prepend(wrapper);    
+  wrapper.innerHTML = `
+  <div id="image-placeholder"></div>
+`;
+  document.body.appendChild(wrapper);    
     
   const container = document.getElementById("image-placeholder");    
   if (!container) return;    
@@ -611,17 +591,6 @@ window.staffNoteOff = function(noteName) {
   drawStatic();    
 };    
     
-  document.getElementById("key-selector").addEventListener("change", e => {    
-    staffSetKey(e.target.value);    
-  });    
-    
-  window.addEventListener("resize", () => {    
-    drawStatic();    
-    notesGroup.innerHTML = "";    
-  });    
-    
-  const selector = document.getElementById("key-selector");
-
-currentKey = selector.value;   // read selected option
+  
 drawStatic(); 
 })();
