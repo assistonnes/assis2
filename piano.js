@@ -695,7 +695,7 @@ function getTotalPianoWidthForKeyWidth(testKeyWidth) {
 }
 
 function getExactFitKeyWidth() {
-  const spacing = 0; // must match whiteKeySpacing in layout
+  const spacing = 1; // must match whiteKeySpacing in layout
   return (
     pianoWrapper.clientWidth
     - (whiteKeys.length - 1) * spacing
