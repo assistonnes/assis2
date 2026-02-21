@@ -338,7 +338,10 @@ measureWrapper.appendChild(measureTape);
   let keyHeight = 150;
 let keyWidth, blackKeyWidth, blackKeyHeight;
 
-const initialVisibleKeys = 12; // change this to whatever you like
+const initialVisibleKeys =
+  window.innerWidth < 500 ? 12 :
+  window.innerWidth < 900 ? 16 :
+  24;
 const spacing = 1;              // whiteKeySpacing
 
   const whiteKeys = [], blackKeys = [];    
