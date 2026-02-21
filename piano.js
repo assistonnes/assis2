@@ -340,8 +340,8 @@ let keyWidth, blackKeyWidth, blackKeyHeight;
 
 const initialVisibleKeys =
   window.innerWidth < 500 ? 12 :
-  window.innerWidth < 900 ? 50 :
-  50;
+  window.innerWidth < 900 ? 24 :
+  36;
 const spacing = 1;              // whiteKeySpacing
 
   const whiteKeys = [], blackKeys = [];    
