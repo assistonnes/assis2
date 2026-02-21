@@ -4,8 +4,8 @@
 #scale-select-wrapper {
   position: absolute;
   left: -0.5%;
-  transform: translate(0%, 765%);
-  top: 0%;
+  transform: translate(0%, -690%);
+  top: 50%;
   z-index: 9999;
 
   padding: 4px 8px;
