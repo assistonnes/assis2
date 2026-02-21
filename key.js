@@ -4,8 +4,8 @@
 #key-select-wrapper {      
   position: absolute;      
   left: 50%; 
-  transform: translate(-230%, -1470%);      
-  top: 50%;      
+  transform: translateX(-230%);      
+  top: 65px;      
   min-width: 60px;      
   text-align: right;      
   z-index: 10;      
