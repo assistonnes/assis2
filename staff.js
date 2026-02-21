@@ -53,7 +53,7 @@
   wrapper.innerHTML = `
   <div id="image-placeholder"></div>
 `;
-  document.body.appendChild(wrapper);    
+  document.body.prepend(wrapper);    
     
   const container = document.getElementById("image-placeholder");    
   if (!container) return;    
