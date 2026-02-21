@@ -32,17 +32,19 @@
 
   <!-- Fullscreen controls -->
   <button id="fullscreenBtn" class="fs-btn" hidden>
-    ⛶ Fullscreen
+    ⛶
   </button>
 
   <button id="exitFullscreenBtn" class="fs-btn" hidden>
-    ✕ Exit
+    ✕
   </button>
 
   <!-- Your existing scripts -->
-  <script src="piano.js"></script>
   <script src="staff.js"></script>
+  <script src="key.js"></script>
   <script src="scale.js"></script>
+  <script src="piano.js"></script>
+  
 
   <!-- Fullscreen + orientation logic -->
   <script>
@@ -98,7 +100,6 @@ if ('serviceWorker' in navigator) {
       .then(reg => console.log('SW registered', reg.scope))
       .catch(err => console.error('SW failed', err));
   });
-}
 }
 </script>
 </body>
